@@ -39,10 +39,10 @@ function MUHAP:OnInitialize()
 	if AuctionsPosterCharDB == nil then
 		AuctionsPosterCharDB = {} 
 	end
-
+	
 	if AuctionsPosterCharDB.items == nil then
 		AuctionsPosterCharDB.items = {} 
-	
+	--[[
 		AuctionsPosterCharDB.items = {
 			{
 				id = 194017,
@@ -81,6 +81,7 @@ function MUHAP:OnInitialize()
 				duration = 1
 			}
 		}
+		]]
 	end
 
  end 
@@ -153,7 +154,7 @@ function MUHAP:OnInitialize()
 		    AuctionHouseFrame.MUHAPFrame.entries[2]:runCheck()
 			AuctionHouseFrame.MUHAPFrame.entries[1]:runCheck()
 		end)
-
+a
 
 		]]
 	

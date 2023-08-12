@@ -158,8 +158,6 @@ function MUHAPScrollFrameMixin:OnLoad()
 	self.items = AuctionsPosterCharDB.items
 	self.filterdItems = {}
 
-	self.entries = {}
-	self.frames = {}
 
 
 	
@@ -201,7 +199,6 @@ function MUHAPScrollFrameMixin:AddItem(entry)
     entry.SubCategory = subclassID
     entry.SubSubCategory = nil
 
-	DevTools_Dump(entry)
 
 	self.items[#self.items + 1] = entry
 
@@ -297,76 +294,98 @@ function MUHAPScrollFrameMixin:UpdateList()
 	self:SortList()
 
 	for i, entry in ipairs(self.filterdItems) do 
-		print(i)
-
-		self.entries[entry.id]:SetParent("MUHAPScrollListItems" .. i)
+		local frame = _G["MUHAPEntryFrame" .. entry.id]
+		local parent = _G["MUHAPScrollListItems" .. i]
+		frame:SetParent(parent)
+		frame:SetAllPoints(parent)
+		parent:Show()
 	end
 
-	--[[
-	for _, entry in pairs(self.filterdItems) do 
-		self:addEntry(entry)
-	end
-
-	if self.filterdItems[#self.filterdItems].id ~= nil then 
-		self:addEntry({
-			id = nil,
-			Category = nil,
-			SubCategory = nil,
-			SubSubCategory = nil,
-			minPrice = 0,
-			lastChecked = time(),
-			qty = 1,
-			enabled = true,
-			needAction = true,
-			duration = 1
-		})
-	end
-	]]
 end
 
 
 function MUHAPScrollFrameMixin:ResetList()
-	self.entries = {}
-	for _, frame in ipairs(self.entries) do 
-		entries:SetParent("MUHAPScrollListItemsHolder")
+
+	local children = { self.list:GetChildren() }
+	local parent = _G["MUHAPScrollListItemsHolder"]
+	for i , Frame in pairs(children) do 
+		local child = Frame:GetChildren()
+		Frame:Hide()
+
+		if child then 
+			child:SetParent(parent)
+			child:SetAllPoints(parent)
+
+		end
 	end
+
+	local frame = _G["MUHAPEntryFramenil"]
+	local parent = _G["MUHAPScrollListItems0"]
+	frame:SetParent(parent)
+	frame:SetAllPoints(parent)
+	parent:Show()
+	
 end
 
 
 
 function MUHAPScrollFrameMixin:generateListFrames()
 
-	local amount = 20
-
+	local amount = #self.items + 20
     local height = 100
 
 	local holder = CreateFrame("Frame", "MUHAPScrollListItemsHolder", self.list)
+	holder:SetPoint("TOPLEFT", 0, 0)
+	holder:SetPoint("TOPRIGHT", 0, 0)
+	holder:SetHeight(100)
 	holder:Hide()
 
+	
+
 	for i = 0, amount, 1 do 
-		local pos = i * height * -1
+		local pos = i* height * -1
 		local Frame = CreateFrame("Frame", "MUHAPScrollListItems" .. i, self.list)
 		Frame:SetPoint("TOPLEFT", 0, pos)
 		Frame:SetPoint("TOPRIGHT", 0, pos)
 		Frame:SetHeight(height)
+		Frame:Hide()
 	end
+
+
+	self:addEntry({
+		id = nil,
+		Category = nil,
+		SubCategory = nil,
+		SubSubCategory = nil,
+		minPrice = 0,
+		lastChecked = time(),
+		qty = 1,
+		enabled = true,
+		needAction = true,
+		duration = 1
+	})
+
+
 
 end
 
-function MUHAPScrollFrameMixin:addEntryFrame()
 
-    local height = 100
-	local Item = CreateFrame("Frame", nil, "MUHAPScrollListItemsHolder", "MUHAPEntryTemplate")
+
+function MUHAPScrollFrameMixin:addEntry(entry)
+	local height = 100
+	local frameName = "MUHAPEntryFramenil"
+	if entry.id then
+		frameName = "MUHAPEntryFrame" .. entry.id
+	end
+	print(" entry.id", entry.id, frameName)
+	local Item = CreateFrame("Frame", frameName, MUHAPScrollListItemsHolder, "MUHAPEntryTemplate")
     Item:SetPoint("TOPLEFT", 0, 0)
     Item:SetPoint("TOPRIGHT", 0, 0)
     Item:SetHeight(height) 
 
-    return Item
-end
+	Item:SetItem(entry)
 
-function MUHAPScrollFrameMixin:addEntry(entry)
-    local frame = self:addEntryFrame()
-    self.entries[entry.id] = frame:SetItem(entry)
+    return Item
 end
 
 

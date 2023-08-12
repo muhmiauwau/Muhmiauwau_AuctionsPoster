@@ -377,6 +377,20 @@
 			</Button>
 
 
+			<Button parentKey="ReloadButton" mixin="MUHAPEntrySettingsButtonMixin">
+                <Size x="22" y="22"/>
+				<Anchors>
+					<Anchor point="TOP" relativeKey="$parent.SettingsButton" relativePoint="BOTTOM" x="0" y="0"/>
+				</Anchors>
+                <NormalTexture atlas="VignetteEvent"/>
+
+                <Scripts>
+                   <OnClick method="reload"/>
+                </Scripts>
+			</Button>
+
+
+
 
 
 

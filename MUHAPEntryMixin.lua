@@ -249,10 +249,10 @@ function MUHAPEntryMixin:InitItem()
 	self.PostButton:SetEnabled(false);
 
 
-	if self.buyoutAmount then 
+	if self.entry.buyoutAmount then 
 		self.MoneyBuyout:Show()
-		self.MoneyBuyout:SetValue(self.buyoutAmount)
-		self.PostButton:SetEnabled(self.entry.needAction and (self.buyoutAmount > self.entry.minPrice))
+		self.MoneyBuyout:SetValue(self.entry.buyoutAmount)
+		self.PostButton:SetEnabled(self.entry.needAction and (self.entry.buyoutAmount > self.entry.minPrice))
 	else 
 		self.MoneyBuyout:Hide()
 	end
@@ -281,10 +281,10 @@ end
 function MUHAPEntryMixin:SetId(id)
 	print("id", id)
 	self.entry.id = id
-	self.entry.itemKey = C_AuctionHouse.MakeItemKey(self.entry.id)
-	self.entry.itemKeyInfo = C_AuctionHouse.GetItemKeyInfo(self.entry.itemKey);
-	SetItemButtonTexture(self.ItemButton, self.entry.itemKeyInfo.iconFileID);
-	self.Name:SetText(AuctionHouseUtil.GetItemDisplayTextFromItemKey(self.entry.itemKey, self.entry.itemKeyInfo));
+	self.itemKey = C_AuctionHouse.MakeItemKey(self.entry.id)
+	self.itemKeyInfo = C_AuctionHouse.GetItemKeyInfo(self.itemKey);
+	SetItemButtonTexture(self.ItemButton, self.itemKeyInfo.iconFileID);
+	self.Name:SetText(AuctionHouseUtil.GetItemDisplayTextFromItemKey(self.itemKey, self.itemKeyInfo));
 
 	self:InitItem()
 end
@@ -357,15 +357,19 @@ function MUHAPEntryMixin:OnEvent(event, itemKey)
         if self.entry.id == itemKey.itemID then 
 			self:UnregisterEvent("ITEM_SEARCH_RESULTS_UPDATED")
             local needUpdate = function(result)
-				print( result.owners[1])
+				print(result.owners[1])
                 return result.owners[1] ~= "player"
             end
 
             local result = C_AuctionHouse.GetItemSearchResultInfo(itemKey, 1)
 
             self.entry.needAction = needUpdate(result)
-            self.buyoutAmount = result.buyoutAmount
+            self.entry.buyoutAmount = result.buyoutAmount
 			self.entry.lastChecked = time()
+
+
+			self:InitItem()
+
 
 			AuctionHouseFrame.MUHAPFrame:UpdateList()
 
@@ -385,7 +389,9 @@ function MUHAPEntryMixin:runCheck()
 
 	print("runCheck",self.entry.id )
 
-	C_AuctionHouse.SendSearchQuery(self.entry.itemKey, {
+
+
+	C_AuctionHouse.SendSearchQuery(self.itemKey, {
 		{sortOrder = Enum.AuctionHouseSortOrder.Buyout, reverseSort = false},
 	}, true)
 end
@@ -403,10 +409,14 @@ function MUHAPEntryMixin:PostItem()
         end
     end
 
-
-
     local bagId, slotId = findinBag(self.entry.id)
-    C_AuctionHouse.PostItem(ItemLocation:CreateFromBagAndSlot(bagId, slotId), self.entry.duration, self.entry.qty, nil, self.buyoutAmount)
+	local ILocation = ItemLocation:CreateFromBagAndSlot(bagId, slotId)
+	local itemsAvaible = C_AuctionHouse.GetAvailablePostCount(ILocation)
+	local qty = (itemsAvaible < self.entry.qty) and itemsAvaible or self.entry.qty
+
+	print(bagId, slotId,qty, self.entry.buyoutAmount)
+
+    C_AuctionHouse.PostItem(ILocation, self.entry.duration, qty, nil, self.entry.buyoutAmount)
 end
 
 
@@ -455,6 +465,11 @@ function MUHAPEntrySettingsButtonMixin:close()
 end
 
 
+function MUHAPEntrySettingsButtonMixin:reload()
+	self:GetParent():runCheck()
+end
+
+
 
 MUHAPEntrySettingsMixin = {}
 
@@ -480,6 +495,8 @@ end
 function MUHAPEntrySettingsMixin:OnShow()
 	print("show")
 	self.entry = self:GetParent().entry
+	self.itemKey = self:GetParent().itemKey
+	self.itemKeyInfo = self:GetParent().itemKeyInfo
 
 
 	if self.entry then 
@@ -487,7 +504,7 @@ function MUHAPEntrySettingsMixin:OnShow()
 			self.DurationDropDown:SetDuration(self.entry.duration)
 		
 			self.EnabledCheckbox:SetState(self.entry.enabled)
-			SetItemButtonTexture(self.ItemDisplay.ItemButton, self.entry.itemKeyInfo.iconFileID);
+			SetItemButtonTexture(self.ItemDisplay.ItemButton, self.itemKeyInfo.iconFileID);
 			self.CreateButton:Hide()
 		else
 			self.entry.duration = 1
@@ -529,7 +546,6 @@ end
 
 function MUHAPEntrySettingsMixin:OnHide()
 	print("hide")
-	self:GetParent():runCheck()
 end
 
 function MUHAPEntrySettingsMixin:HideSettings()
