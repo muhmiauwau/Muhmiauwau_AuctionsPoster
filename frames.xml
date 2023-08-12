@@ -1,0 +1,580 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\FrameXML\UI.xsd">
+
+    <Script file="mixins.lua"/>
+    <Script file="MUHAPEntryMixin.lua"/>
+
+
+    <Frame name="MUHAPFrameTemplate" mixin="MUHAPScrollFrameMixin"  virtual="true">
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeKey="$parent.CategoriesList" relativePoint="TOPRIGHT" x="0" y="0"/>
+            <Anchor point="BOTTOMLEFT" relativeKey="$parent.CategoriesList" relativePoint="BOTTOMRIGHT" x="8" y="0"/>
+            <Anchor point="RIGHT" x="-23" y="0"/>
+        </Anchors>
+        <Scripts>
+			<OnLoad method="OnLoad"/>
+			<OnEvent method="OnEvent"/>
+			<OnHide method="OnHide"/>
+            <OnHide method="OnShow"/>
+		</Scripts>
+    </Frame>
+
+	<Frame name="AuctionHouseSellFrameAlignedControlTemplate" mixin="AuctionHouseSellFrameAlignedControlMixin" virtual="true">
+		<Size x="200" y="30"/>
+		<!-- You can set the label text with a key value:
+		<KeyValues>
+			<KeyValue key="labelText" value="AUCTION_HOUSE_UNIT_PRICE_LABEL" type="global"/>
+		</KeyValues>
+		-->
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString parentKey="Label" inherits="GameFontNormal" justifyH="RIGHT">
+					<Size x="93" y="0"/>
+					<Anchors>
+						<Anchor point="LEFT"/>
+					</Anchors>
+					<Color color="NORMAL_FONT_COLOR"/>
+					<Shadow x="1" y="-1">
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+				</FontString>
+				<FontString parentKey="LabelTitle" inherits="GameFontNormal" justifyH="RIGHT" hidden="true">
+					<Size x="90" y="0"/>
+					<Anchors>
+						<Anchor point="LEFT" x="0" y="7"/>
+					</Anchors>
+					<Color color="NORMAL_FONT_COLOR"/>
+					<Shadow x="1" y="-1">
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+				</FontString>
+				<FontString parentKey="Subtext" inherits="GameFontNormalSmall" justifyH="RIGHT" hidden="true">
+					<Size x="90" y="0"/>
+					<Anchors>
+						<Anchor point="TOP" relativeKey="$parent.LabelTitle" relativePoint="BOTTOM" x="0" y="-1"/>
+						<Anchor point="LEFT" x="0" y="-6"/>
+					</Anchors>
+					<Color color="DISABLED_FONT_COLOR"/>
+					<Shadow x="1" y="-1">
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+		</Scripts>
+	</Frame>
+
+
+    <Frame name="MUHAPPriceInputFrameTemplate" mixin="MUHAPPriceInputFrameMixin" inherits="AuctionHouseSellFrameAlignedControlTemplate" virtual="true">
+		<Frames>
+			<Frame parentKey="MoneyInputFrame" inherits="LargeMoneyInputFrameTemplate">
+				<KeyValues>
+					<KeyValue key="hideCopper" value="true" type="boolean"/>
+				</KeyValues>
+				<Size x="150" y="33"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.Label" relativePoint="RIGHT" x="18" y="-2"/>
+				</Anchors>
+			</Frame>
+			<Frame parentKey="PriceError" mixin="AuctionHousePriceErrorFrameMixin" enableMouse="true" hidden="true">
+				<Size x="20" y="20"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.MoneyInputFrame" relativePoint="RIGHT" x="10" y="0" />
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture file="Interface\DialogFrame\UI-Dialog-Icon-AlertNew">
+							<Size x="20" y="20"/>
+							<Anchors>
+								<Anchor point="CENTER" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter method="OnEnter"/>
+					<OnLeave method="OnLeave"/>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString parentKey="PerItemPostfix" inherits="GameFontNormalSmall" justifyH="LEFT" text="AUCTION_HOUSE_PER_ITEM_LABEL" hidden="true">
+					<Anchors>
+						<Anchor point="LEFT" relativeKey="$parent.MoneyInputFrame" relativePoint="RIGHT" x="4" y="4"/>
+					</Anchors>
+					<Color color="DISABLED_FONT_COLOR"/>
+					<Shadow x="1" y="-1">
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+		</Scripts>
+	</Frame>
+
+
+
+	<Frame name="MUHAPDurationDropDownTemplate" mixin="MUHAPDurationDropDownMixin" inherits="AuctionHouseSellFrameAlignedControlTemplate" virtual="true">
+		<Frames>
+			<Frame parentKey="DropDown" mixin="AuctionHouseDurationDropDownMixin" inherits="LargeUIDropDownMenuTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.Label" relativePoint="RIGHT" x="17" y="-2"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad method="OnLoad"/>
+					<OnShow method="OnShow"/>
+				</Scripts>
+			</Frame>
+		</Frames>
+	</Frame>
+
+
+
+	<Frame name="MUHAPEnabledTemplate" mixin="MUHAPEnabledMixin" inherits="AuctionHouseSellFrameAlignedControlTemplate" virtual="true">
+		<Frames>
+			<CheckButton parentKey="CheckButton" mixin="MUHAPCheckButtonMixin" inherits="UICheckButtonTemplate">
+				<Size x="36" y="36"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.Label" relativePoint="RIGHT" x="17" y="-2"/>
+				</Anchors>
+				<Scripts>
+					<OnClick method="OnClick"/>
+				</Scripts>
+			</CheckButton>
+		</Frames>
+	</Frame>
+
+
+
+
+
+
+
+
+
+
+	<Frame name="MUHAPQuantityInputFrameTemplate" mixin="AuctionHouseAlignedQuantityInputFrameMixin" inherits="AuctionHouseSellFrameAlignedControlTemplate" virtual="true">
+		<Frames>
+			<EditBox parentKey="InputBox" mixin="AuctionHouseAlignedQuantityInputBoxMixin" inherits="AuctionHouseQuantityInputEditBoxTemplate">
+				<Size x="150" y="33"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.Label" relativePoint="RIGHT" x="18" y="-2"/>
+				</Anchors>
+				<Scripts>
+					<OnEditFocusLost method="OnEditFocusLost"/>
+				</Scripts>
+			</EditBox>
+		</Frames>
+	</Frame>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <Frame name="MUHAPEntryTextTemplate" mixin="MUHAPEntryTextMixin" virtual="true">
+		<Size x="32" y="13"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString parentKey="Key" inherits="GameFontNormalSmall" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="RIGHT" relativeKey="$parent"  relativePoint="CENTER" x="-2" y="0"/>
+					</Anchors>
+				</FontString>
+                <FontString parentKey="Value" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="LEFT" relativeKey="$parent"  relativePoint="CENTER" x="2" y="0"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+		</Scripts>
+	</Frame>
+
+
+    <Frame name="MUHAPEntryMoneyTemplate" mixin="MUHAPEntryMoneyMixin" virtual="true">
+		<Size x="32" y="13"/>
+        <Frames>
+            <Frame parentKey="Money" inherits="MoneyDisplayFrameTemplate">
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent"  relativePoint="CENTER" x="4" y="0"/>
+                </Anchors>
+                <KeyValues>
+                    <KeyValue key="hideCopper" value="true" type="boolean"/>
+                    <KeyValue key="leftAlign" value="true" type="boolean"/>
+                    <KeyValue key="useAuctionHouseIcons" value="true" type="boolean"/>
+                    <KeyValue key="alwaysShowGold" value="false" type="boolean"/>
+                </KeyValues>
+            </Frame>
+        </Frames>   
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString parentKey="Key" inherits="GameFontNormalSmall" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="RIGHT" relativeKey="$parent"  relativePoint="CENTER" x="-4" y="0"/>
+					</Anchors>
+				</FontString>
+               
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+		</Scripts>
+	</Frame>
+
+
+
+
+
+
+
+
+    <Frame name="MUHAPEntrySettingsTemplate"  mixin="MUHAPEntrySettingsMixin" hidden="true"  virtual="true">
+        <Frames>
+
+
+
+
+            <Button parentKey="SettingsButton" mixin="MUHAPEntrySettingsButtonMixin">
+                <Size x="22" y="22"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="-12" y="-12"/>
+				</Anchors>
+                <NormalTexture atlas="Warfronts-BaseMapIcons-Empty-Workshop-Minimap"/>
+                <Scripts>
+                   <OnClick method="close"/>
+                </Scripts>
+			</Button>
+
+
+
+			<Button parentKey="ItemDisplay" inherits="AuctionHouseInteractableItemDisplayTemplate" mixin="MUHAPItemDisplayMixin" >
+				<Size x="70" y="100"/>
+				<Anchors>
+					<Anchor point="LEFT" x="0" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad method="OnLoad"/>
+				</Scripts>
+			</Button>
+
+
+		
+
+
+			<Frame parentKey="QuantityInput" inherits="MUHAPQuantityInputFrameTemplate">
+				<KeyValues>
+					<KeyValue key="labelText" value="MUHAP_QUANTITY_LABEL" type="global"/>
+				</KeyValues>
+				<Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="70" y="18" />
+				</Anchors>
+			</Frame>
+
+
+            <Frame parentKey="PriceInput" inherits="MUHAPPriceInputFrameTemplate">
+				<KeyValues>
+					<KeyValue key="labelText" value="MUHAP_MIN_UNIT_PRICE_LABEL" type="global"/>
+				</KeyValues>
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" x="70" y="-18" />
+				</Anchors>
+			</Frame>
+
+
+
+
+			<Frame parentKey="DurationDropDown" inherits="MUHAPDurationDropDownTemplate">
+				<KeyValues>
+					<KeyValue key="labelText" value="MUHAP_DURATION_LABEL" type="global"/>
+				</KeyValues>
+				<Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.QuantityInput" relativePoint="RIGHT" x="40" y="0" />
+				</Anchors>
+			</Frame>
+
+			<Frame parentKey="EnabledCheckbox" inherits="MUHAPEnabledTemplate">
+				<KeyValues>
+					<KeyValue key="labelText" value="MUHAP_ENABLED" type="global"/>
+				</KeyValues>
+				<Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.PriceInput" relativePoint="RIGHT" x="40" y="0" />
+				</Anchors>
+			</Frame>
+
+
+ 			<Button parentKey="CreateButton" mixin="MUHAPEntryCreateButtonMixin" inherits="UIPanelButtonTemplate" text="MUHAP_CREATE_BUTTON">
+				<Size x="194" y="22"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.PriceInput" relativePoint="RIGHT" x="80" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnClick method="OnClick"/>
+				</Scripts>
+			</Button>
+
+
+
+
+
+
+
+
+        </Frames>
+        <Layers>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Background" atlas="GarrMissionLocation-Maw-ButtonBG" ></Texture>
+			</Layer>
+		</Layers>
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+            <OnShow method="OnShow"/>
+            <OnHide method="OnHide"/>
+        </Scripts>
+    </Frame>
+
+
+
+
+    <Frame name="MUHAPEntryTemplate"  mixin="MUHAPEntryMixin"  virtual="true">
+        <Frames>
+
+
+            <Frame parentKey="Settings" inherits="MUHAPEntrySettingsTemplate"  frameLevel="400">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="0" y="0" />
+                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="0" y="0" />
+                </Anchors>
+            </Frame>
+
+
+            <Button parentKey="SettingsButton" mixin="MUHAPEntrySettingsButtonMixin">
+                <Size x="22" y="22"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="-12" y="-12"/>
+				</Anchors>
+                <NormalTexture atlas="Warfronts-BaseMapIcons-Empty-Workshop-Minimap"/>
+
+                <Scripts>
+                   <OnClick method="open"/>
+                </Scripts>
+			</Button>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			<Button parentKey="ItemButton" inherits="GiantItemButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" x="12" y="0"/>
+				</Anchors>
+			</Button>
+
+
+
+            <Button parentKey="PostButton" motionScriptsWhileDisabled="true" mixin="MUHAPEntryPostButtonMixin" inherits="UIPanelButtonTemplate" text="AUCTION_HOUSE_POST_BUTTON" frameLevel="350">
+				<KeyValues>
+					<KeyValue key="leftPadding" value="74" type="number"/>
+				</KeyValues>
+				<Size x="194" y="22"/>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="-12" y="20"/>
+				</Anchors>
+				<Scripts>
+					<OnClick method="OnClick"/>
+				</Scripts>
+			</Button>
+
+
+    
+
+
+
+
+
+
+            <Frame parentKey="MoneyMin" inherits="MUHAPEntryMoneyTemplate">
+                <KeyValues>
+                     <KeyValue key="type" value="MUHAP_TEXT_TYPE.minPrice" type="global"/>
+                </KeyValues>
+                <Anchors>
+                  <Anchor point="BOTTOM" relativeKey="$parent.PostButton" relativePoint="TOP" x="0" y="26" />
+                </Anchors>
+            </Frame>
+
+            
+            <Frame parentKey="MoneyBuyout" inherits="MUHAPEntryMoneyTemplate">
+                <KeyValues>
+                     <KeyValue key="type" value="MUHAP_TEXT_TYPE.buyout" type="global"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="BOTTOM" relativeKey="$parent.PostButton" relativePoint="TOP" x="0" y="6" />
+                </Anchors>
+            </Frame>
+
+
+     
+
+
+	 		<Frame parentKey="TextDuration" inherits="MUHAPEntryTextTemplate">
+                <KeyValues>
+                    <KeyValue key="type" value="MUHAP_TEXT_TYPE.Duration" type="global"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT" x="-250" y="24" />
+                </Anchors>
+            </Frame>
+
+
+            <Frame parentKey="TextQty" inherits="MUHAPEntryTextTemplate">
+                <KeyValues>
+                    <KeyValue key="type" value="MUHAP_TEXT_TYPE.qty" type="global"/>
+                </KeyValues>
+                <Anchors>
+                     <Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT" x="-250" y="8" />
+                </Anchors>
+            </Frame>
+
+
+
+            <Frame parentKey="TextAvailable" inherits="MUHAPEntryTextTemplate">
+                <KeyValues>
+                    <KeyValue key="type" value="MUHAP_TEXT_TYPE.Available" type="global"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="CENTER" relativeKey="$parent" relativePoint="RIGHT" x="-250" y="-8" />
+                </Anchors>
+            </Frame>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <Frame parentKey="lastChecked" inherits="MUHAPEntryTextTemplate">
+                <KeyValues>
+                    <KeyValue key="type" value="MUHAP_TEXT_TYPE.lastChecked" type="global"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="BOTTOM" relativeKey="$parent" relativePoint="BOTTOM" x="-50" y="12" />
+                </Anchors>
+            </Frame>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+           
+
+		</Frames>
+        <Layers>
+			<Layer level="ARTWORK">
+
+                <FontString parentKey="Name" inherits="SystemFont_Shadow_Large" justifyH="LEFT">
+					<Size x="0" y="64"/>
+					<Anchors>
+						<Anchor point="LEFT" relativeKey="$parent.ItemButton" relativePoint="RIGHT" x="12" y="0"/>
+                        <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-300" y="0"/>
+					</Anchors>
+				</FontString>
+                <Texture parentKey="Highlight" atlas="GarrMissionLocation-Maw-ButtonHighlight" alpha="0.2"></Texture>
+                <Texture parentKey="actionBackground" atlas="GarrMissionLocation-Maw-ButtonBG" alpha="1"></Texture>
+				<Texture parentKey="Background" atlas="GarrMissionLocation-Maw-ButtonBG" alpha="0.2"></Texture>
+			</Layer>
+		</Layers>
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+            <OnEvent method="OnEvent"/>
+            <OnEnter method="OnEnter"/>
+            <OnLeave method="OnLeave"/>
+        </Scripts>
+    </Frame>
+
+
+    <Frame name="AuctionHouseMUHAPCategoriesListTemplate" mixin="AuctionHouseMUHAPCategoriesListMixin" virtual="true">
+		<Size x="168" y="438"/>
+		<KeyValues>
+			<KeyValue key="layoutType" value="InsetFrameTemplate" type="string"/>
+		</KeyValues>
+		<Frames>
+			<Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate"/>
+
+			<Frame parentKey="ScrollBox" inherits="WowScrollBoxList">
+				<Anchors>
+					<Anchor point="TOPLEFT" x="3" y="-6"/>
+					<Anchor point="BOTTOMRIGHT" x="-25" y="2"/>
+				</Anchors>
+			</Frame>
+			<EventFrame parentKey="ScrollBar" inherits="MinimalScrollBar">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent.ScrollBox" relativePoint="TOPRIGHT" x="6" y="0"/>
+					<Anchor point="BOTTOMLEFT" relativeKey="$parent.ScrollBox" relativePoint="BOTTOMRIGHT" x="6" y="4"/>
+				</Anchors>
+			</EventFrame>
+		</Frames>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Background" atlas="auctionhouse-background-categories" useAtlasSize="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="3" y="-3"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+			<Scripts>
+				<OnLoad method="OnLoad"/>
+				<OnShow method="OnShow"/>
+			</Scripts>
+	</Frame>
+</Ui>
