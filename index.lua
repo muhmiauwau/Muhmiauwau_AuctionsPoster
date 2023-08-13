@@ -133,8 +133,6 @@ function MUHAP:OnInitialize()
 		-- create schrollframe
 		AuctionHouseFrame.MUHAPFooter = CreateFrame("Frame", nil, AuctionHouseFrame, "MUHAPFooterTemplate")
 
-		
-	
 		-- create schrollframe
 		AuctionHouseFrame.MUHAPTabs = CreateFrame("Frame", nil, AuctionHouseFrame, "MUHAPTabsTemplate")
 
@@ -164,7 +162,7 @@ function MUHAP:OnInitialize()
 
 		PanelTemplates_SetNumTabs(AuctionHouseFrame, tabsAmount);
 
-		
+
 	end 
 end
 

@@ -267,7 +267,7 @@ function MUHAPScrollFrameMixin:FilterList()
 		end
 
 		if item ~= nil then
-			print("in filter", self.showDisabled, item.enabled, item.id)
+			--print("in filter", self.showDisabled, item.enabled, item.id)
 			if not self.showDisabled and not item.enabled then 
 				item = nil
 			elseif self.showDisabled and item.enabled then  
@@ -287,7 +287,7 @@ end
 
 function MUHAPScrollFrameMixin:checkStatus(entry)
 	if not entry then return end
-	if not entry.enabled then return end
+	if not entry.enabled then return entry end
 
 	entry.status = entry.status or {auction = false, check = false}
 
@@ -461,7 +461,7 @@ end
 
 
 function MUHAPScrollFrameMixin:triggerAllChecks()
-	print("triggerAllChecks")
+	--print("triggerAllChecks")
 
 
 	for i, entry in ipairs(self.filterdItems) do 
@@ -477,7 +477,7 @@ function MUHAPScrollFrameMixin:triggerAllChecks()
  end
 
  function MUHAPScrollFrameMixin:triggerAllPostAuctions()
-	print("triggerAllPostAuctions")
+--	print("triggerAllPostAuctions")
 	
 	if #self.filterdItems > 0 then 
 

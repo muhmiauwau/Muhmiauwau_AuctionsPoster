@@ -271,6 +271,7 @@ function MUHAPEntryMixin:InitItem()
 	self.lastChecked:SetColor(1, 1, 1, 0.5)	
 	self.lastChecked:SetValue(date("%d.%m.%y %H:%M:%S", self.entry.lastChecked ))
 
+
 end
 
 
@@ -292,6 +293,15 @@ function MUHAPEntryMixin:SetId(id)
 	SetItemButtonTexture(self.ItemButton, self.itemKeyInfo.iconFileID);
 	self.Name:SetText(AuctionHouseUtil.GetItemDisplayTextFromItemKey(self.itemKey, self.itemKeyInfo));
 
+
+
+	if not self.entry.isCommodity then 
+		local ILocation = self:getItemLocation()
+		if ILocation then 
+			self.entry.isCommodity = (C_AuctionHouse.GetItemCommodityStatus(ILocation) == 2 ) and true or false
+		end
+	end
+
 	self:InitItem()
 end
 
@@ -308,7 +318,7 @@ end
 
 function MUHAPEntryMixin:SetAvailable()
 	local findinBag = function(itemID)
-        for i = 0, NUM_BAG_SLOTS do
+        for i = 0, (NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS) do
             for z = 1, C_Container.GetContainerNumSlots(i) do
                 if C_Container.GetContainerItemID(i, z) == itemID then
                     return i, z
@@ -359,32 +369,63 @@ end
 
 
 function MUHAPEntryMixin:OnEvent(event, itemKey)
-    if event == "ITEM_SEARCH_RESULTS_UPDATED" then
-        if self.entry.id == itemKey.itemID then 
-			self:UnregisterEvent("ITEM_SEARCH_RESULTS_UPDATED")
+
+	if event == "ITEM_SEARCH_RESULTS_UPDATED" or event == "COMMODITY_SEARCH_RESULTS_UPDATED" then
+		local itemID = itemKey
+
+		if event == "ITEM_SEARCH_RESULTS_UPDATED" then
+			itemID = itemKey.itemID
+		end
+
+		if self.entry.id == itemID then 
+			self:UnregisterEvent(event)
+
+			
+
+			local priceKey = "buyoutAmount"
+			if self.entry.isCommodity then 
+				priceKey = "unitPrice"
+			end
 
 
             local needUpdate = function(result)
-				local _, realm =  UnitName("player")
-				local formattedName = MUHAP:formatPlayerName(result.owners[1], realm )
 				local match = true
-				if result.owners[1] == "player" or AuctionsPosterDB.activeChars[formattedName] or AuctionsPosterDB.activeChars[result.owners[1]] then 
+				
+				if #result.owners > 0 then 
+					local _, realm =  UnitName("player")
+					local formattedName = MUHAP:formatPlayerName(result.owners[1], realm )
+					if result.owners[1] == "player" or AuctionsPosterDB.activeChars[formattedName] or AuctionsPosterDB.activeChars[result.owners[1]] then 
+						match = false
+					end
+				else
+					match = false
+				end
+				
+				if self.entry.minPrice > result[priceKey] then 
 					match = false
 				end
 
                 return match
             end
 
-            local result = C_AuctionHouse.GetItemSearchResultInfo(itemKey, 1)
+			local result = nil
+			
+			if self.entry.isCommodity then 
+				result = C_AuctionHouse.GetCommoditySearchResultInfo(itemID, 1)
+			else 
+				result = C_AuctionHouse.GetItemSearchResultInfo(itemKey, 1)
+			end
+			
 
 			if result then 
 				self.entry.needAction = needUpdate(result)
-				self.entry.buyoutAmount = result.buyoutAmount
+				self.entry.buyoutAmount = result[priceKey]
 			else
 				self.entry.needAction = false
 				self.entry.buyoutAmount = 0
 			end
 
+			--print("ok?")
 			self.entry.lastChecked = time()
 
 
@@ -402,6 +443,8 @@ function MUHAPEntryMixin:OnEvent(event, itemKey)
 
 		self.lastAuctionTimer = C_Timer.NewTimer(3, function() 
 			print("all auctions created")
+			self.PostButton:SetEnabled(false)
+
 			AuctionHouseFrame.MUHAPFrame:FilterList()
 			AuctionHouseFrame.MUHAPFrame:UpdateList()
 
@@ -425,20 +468,27 @@ function MUHAPEntryMixin:runCheck()
 
 	print("runCheck ", self.entry.id)
 
-	self:RegisterEvent("ITEM_SEARCH_RESULTS_UPDATED")
+	if self.entry.isCommodity then 
+		--print("COMMODITY")
+		self:RegisterEvent("COMMODITY_SEARCH_RESULTS_UPDATED")
+		C_AuctionHouse.SendSearchQuery(self.itemKey, {
+			{sortOrder = Enum.AuctionHouseSortOrder.Price, reverseSort = false},
+		}, true)
+	else
+		--print("item")
+		self:RegisterEvent("ITEM_SEARCH_RESULTS_UPDATED")
 
+		C_AuctionHouse.SendSearchQuery(self.itemKey, {
+			{sortOrder = Enum.AuctionHouseSortOrder.Buyout, reverseSort = false},
+		}, true)
+	end
 
-
-	C_AuctionHouse.SendSearchQuery(self.itemKey, {
-		{sortOrder = Enum.AuctionHouseSortOrder.Buyout, reverseSort = false},
-	}, true)
 end
 
+function MUHAPEntryMixin:getItemLocation()
 
-function MUHAPEntryMixin:PostItem()
-
-    local findinBag = function(itemID)
-        for i = 0, NUM_BAG_SLOTS do
+	local findinBag = function(itemID)
+        for i = 0, (NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS) do
             for z = 1, C_Container.GetContainerNumSlots(i) do
                 if C_Container.GetContainerItemID(i, z) == itemID then
                     return i, z
@@ -448,7 +498,14 @@ function MUHAPEntryMixin:PostItem()
     end
 
     local bagId, slotId = findinBag(self.entry.id)
-	local ILocation = ItemLocation:CreateFromBagAndSlot(bagId, slotId)
+	--(self.entry.id, bagId, slotId )
+	return ItemLocation:CreateFromBagAndSlot(bagId, slotId)
+
+end
+
+
+function MUHAPEntryMixin:PostItem()
+	local ILocation = self:getItemLocation()
 	local itemsAvaible = C_AuctionHouse.GetAvailablePostCount(ILocation)
 	local qty = (itemsAvaible < self.entry.qty) and itemsAvaible or self.entry.qty
 
@@ -457,7 +514,13 @@ function MUHAPEntryMixin:PostItem()
 
 	self:RegisterEvent("AUCTION_HOUSE_AUCTION_CREATED")
 
-    C_AuctionHouse.PostItem(ILocation, self.entry.duration, qty, nil, self.entry.buyoutAmount)
+	if self.entry.isCommodity then 
+		C_AuctionHouse.PostCommodity(ILocation, self.entry.duration, qty, self.entry.buyoutAmount)
+	else 
+		C_AuctionHouse.PostItem(ILocation, self.entry.duration, qty, nil, self.entry.buyoutAmount)
+	end
+
+   
 
 
 	
@@ -598,7 +661,7 @@ function MUHAPEntrySettingsMixin:createNewItem()
 	local newId = self.ItemDisplay:GetItemID()
 	if newId then 
 		if not AuctionHouseFrame.MUHAPFrame:checkIfExits(newId) then 
-			print("createNewItem")
+			--print("createNewItem")
 			self.entry.id = newId
 			self:Hide()
 			AuctionHouseFrame.MUHAPFrame:AddItem(self.entry)
