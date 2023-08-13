@@ -279,7 +279,7 @@ end
 
 
 function MUHAPEntryMixin:SetId(id)
-	print("id", id)
+	--print("id", id)
 	self.entry.id = id
 	self.itemKey = C_AuctionHouse.MakeItemKey(self.entry.id)
 	self.itemKeyInfo = C_AuctionHouse.GetItemKeyInfo(self.itemKey);
@@ -348,7 +348,7 @@ end
 
 
 function MUHAPEntryMixin:OnLoad()
-    print("OnLoad")
+   -- print("OnLoad")
 end
 
 
@@ -356,15 +356,28 @@ function MUHAPEntryMixin:OnEvent(event, itemKey)
     if event == "ITEM_SEARCH_RESULTS_UPDATED" then
         if self.entry.id == itemKey.itemID then 
 			self:UnregisterEvent("ITEM_SEARCH_RESULTS_UPDATED")
+
+
             local needUpdate = function(result)
-				print(result.owners[1])
-                return result.owners[1] ~= "player"
+				local _, realm =  UnitFullName("player")
+				local match = true
+				if result.owners[1] == "player" or AuctionsPosterDB.activeChars[result.owners[1] .. "-" .. realm] or AuctionsPosterDB.activeChars[result.owners[1]] then 
+					match = false
+				end
+				
+                return match
             end
 
             local result = C_AuctionHouse.GetItemSearchResultInfo(itemKey, 1)
 
-            self.entry.needAction = needUpdate(result)
-            self.entry.buyoutAmount = result.buyoutAmount
+			if  result then 
+				self.entry.needAction = needUpdate(result)
+				self.entry.buyoutAmount = result.buyoutAmount
+	
+			else
+				self.entry.needAction = true
+			end
+
 			self.entry.lastChecked = time()
 
 
@@ -374,6 +387,18 @@ function MUHAPEntryMixin:OnEvent(event, itemKey)
 			AuctionHouseFrame.MUHAPFrame:UpdateList()
 
         end
+	elseif event == "AUCTION_HOUSE_AUCTION_CREATED" then 
+		
+		if self.lastAuctionTimer then
+			self.lastAuctionTimer:Cancel()
+		end
+		
+
+		self.lastAuctionTimer = C_Timer.NewTimer(3, function() 
+			print("all auctions created")
+			self:runCheck()
+			self:UnregisterEvent("AUCTION_HOUSE_AUCTION_CREATED")
+		end)
 	end
 end
 
@@ -387,7 +412,7 @@ function MUHAPEntryMixin:runCheck()
 
 	self:RegisterEvent("ITEM_SEARCH_RESULTS_UPDATED")
 
-	print("runCheck",self.entry.id )
+	--print("runCheck",self.entry.id )
 
 
 
@@ -414,9 +439,13 @@ function MUHAPEntryMixin:PostItem()
 	local itemsAvaible = C_AuctionHouse.GetAvailablePostCount(ILocation)
 	local qty = (itemsAvaible < self.entry.qty) and itemsAvaible or self.entry.qty
 
-	print(bagId, slotId,qty, self.entry.buyoutAmount)
+
+	self:RegisterEvent("AUCTION_HOUSE_AUCTION_CREATED")
 
     C_AuctionHouse.PostItem(ILocation, self.entry.duration, qty, nil, self.entry.buyoutAmount)
+
+
+	
 end
 
 
@@ -483,7 +512,7 @@ function MUHAPEntrySettingsMixin:OnLoad()
 	end);
 
 	self.PriceInput:SetOnValueChangedCallback(function()
-		print(self.PriceInput:GetAmount())
+		--print(self.PriceInput:GetAmount())
 		self.entry.minPrice = self.PriceInput:GetAmount();
 		self:GetParent():SetMinPrice()
 	end);
@@ -493,7 +522,7 @@ function MUHAPEntrySettingsMixin:OnLoad()
 end
 
 function MUHAPEntrySettingsMixin:OnShow()
-	print("show")
+	--print("show")
 	self.entry = self:GetParent().entry
 	self.itemKey = self:GetParent().itemKey
 	self.itemKeyInfo = self:GetParent().itemKeyInfo
@@ -545,7 +574,7 @@ end
 
 
 function MUHAPEntrySettingsMixin:OnHide()
-	print("hide")
+	--print("hide")
 end
 
 function MUHAPEntrySettingsMixin:HideSettings()
@@ -556,7 +585,7 @@ end
 
 function MUHAPEntrySettingsMixin:OnDurationUpdated()
 	if self.entry then 
-		print("OnDurationUpdated", self.DurationDropDown:GetDuration())
+		--print("OnDurationUpdated", self.DurationDropDown:GetDuration())
 
 		self.entry.duration = self.DurationDropDown:GetDuration()
 		self:GetParent():SetDuration()
@@ -660,7 +689,7 @@ end
 function MUHAPEnabledMixin:SetState(state)
 
 	self.CheckButton:SetChecked(state);
-	print("UpdateState", state)
+	--print("UpdateState", state)
 end
 
 

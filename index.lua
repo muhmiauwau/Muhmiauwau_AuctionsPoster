@@ -36,6 +36,16 @@ MUHAP_CREATE_BUTTON = "Create"
 function MUHAP:OnInitialize()
 	-- AHCC:initOptions()
 
+
+	if AuctionsPosterDB == nil then
+		AuctionsPosterDB = {} 
+	end
+	
+	if AuctionsPosterDB.activeChars == nil then
+		AuctionsPosterDB.activeChars = {} 
+	end
+
+
 	if AuctionsPosterCharDB == nil then
 		AuctionsPosterCharDB = {} 
 	end
@@ -82,6 +92,13 @@ function MUHAP:OnInitialize()
 			}
 		}
 		]]
+	end
+
+	if #AuctionsPosterCharDB.items > 0 then 
+		local name, realm =  UnitFullName("player")
+		local nameWithRealm = name.. "-" .. realm
+		
+		AuctionsPosterDB.activeChars[nameWithRealm] = time()
 	end
 
  end 

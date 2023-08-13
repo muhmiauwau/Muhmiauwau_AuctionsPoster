@@ -192,15 +192,24 @@ end
 function MUHAPScrollFrameMixin:AddItem(entry)
 
 	local itemName, itemLink, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType,
-    itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
-    expacID, setID, isCraftingReagent = GetItemInfo(entry.id)
+	itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
+	expacID, setID, isCraftingReagent = GetItemInfo(entry.id)
+
+
+	if classID == 3 then --gems
+		classID = 4
+	elseif  classID == 1 then --container
+		classID = 3 
+	end
+
 
 	entry.Category = classID
     entry.SubCategory = subclassID
     entry.SubSubCategory = nil
 
-
+	
 	self.items[#self.items + 1] = entry
+	self:addEntry(entry)
 
 	self:FilterList()
 	self:UpdateList()
@@ -212,6 +221,8 @@ function MUHAPScrollFrameMixin:OnCategorySelected(selectedCategoryIndex, selecte
     self.selectedCategoryIndex = selectedCategoryIndex;
 	self.selectedSubCategoryIndex = selectedSubCategoryIndex;
 	self.selectedSubSubCategoryIndex = selectedSubSubCategoryIndex;
+
+	print(selectedCategoryIndex, selectedSubCategoryIndex, selectedSubSubCategoryIndex)
 
 	self:FilterList()
     self:UpdateList()
@@ -252,15 +263,10 @@ end
 function MUHAPScrollFrameMixin:SortList()
 
 	table.sort(self.filterdItems, function(a,b)
-		return a.needAction and not b.needAction
-	end)
 
-	table.sort(self.filterdItems, function(a,b)
-		if a.needAction == b.needAction then 
-			return a.lastChecked > b.lastChecked
-		else
-			return false
-		end
+		return
+			a.needAction and not b.needAction or
+            (a.needAction == b.needAction and a.lastChecked > b.lastChecked)
 	end)
 
 end
@@ -289,7 +295,7 @@ function MUHAPScrollFrameMixin:checkIfExits(id)
 end
 
 function MUHAPScrollFrameMixin:UpdateList()
-	print("UpdateList")
+	--print("UpdateList")
 	self:ResetList()
 	self:SortList()
 
@@ -361,7 +367,7 @@ function MUHAPScrollFrameMixin:generateListFrames()
 		lastChecked = time(),
 		qty = 1,
 		enabled = true,
-		needAction = true,
+		needAction = false,
 		duration = 1
 	})
 
@@ -377,7 +383,7 @@ function MUHAPScrollFrameMixin:addEntry(entry)
 	if entry.id then
 		frameName = "MUHAPEntryFrame" .. entry.id
 	end
-	print(" entry.id", entry.id, frameName)
+	--print(" entry.id", entry.id, frameName)
 	local Item = CreateFrame("Frame", frameName, MUHAPScrollListItemsHolder, "MUHAPEntryTemplate")
     Item:SetPoint("TOPLEFT", 0, 0)
     Item:SetPoint("TOPRIGHT", 0, 0)
@@ -390,7 +396,7 @@ end
 
 
 function MUHAPScrollFrameMixin:OnEvent(event, ...)
-    print(event)
+   -- print(event)
 end
 
 
@@ -408,11 +414,7 @@ function AuctionHouseMUHAPCategoriesListMixin:SetSelectedCategory(selectedCatego
     self.selectedCategoryIndex = selectedCategoryIndex;
 	self.selectedSubCategoryIndex = selectedSubCategoryIndex;
 	self.selectedSubSubCategoryIndex = selectedSubSubCategoryIndex;
-
-    print("select")
-
     AuctionHouseFrame.MUHAPFrame:OnCategorySelected(selectedCategoryIndex, selectedSubCategoryIndex, selectedSubSubCategoryIndex)
-
 	AuctionFrameFilters_Update(self);
 end
 
