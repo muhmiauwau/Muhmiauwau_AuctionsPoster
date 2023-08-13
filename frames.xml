@@ -716,7 +716,6 @@
 			<Scripts>
 				<OnLoad method="OnLoad"/>
 				<OnShow method="OnShow"/>
-				<OnShow method="OnHide"/>
 			</Scripts>
 	</Frame>
 </Ui>
