@@ -252,17 +252,13 @@ function MUHAPEntryMixin:InitItem()
 	if self.entry.buyoutAmount then 
 		self.MoneyBuyout:Show()
 		self.MoneyBuyout:SetValue(self.entry.buyoutAmount)
-		self.PostButton:SetEnabled(self.entry.needAction and (self.entry.buyoutAmount > self.entry.minPrice))
+		self.PostButton:SetEnabled(self.entry.needAction and self.entry.enabled and (self.entry.buyoutAmount > self.entry.minPrice))
 	else 
 		self.MoneyBuyout:Hide()
 	end
 
 
-	if self.entry.needAction  then 
-		self.actionBackground:Show()
-	else
-		self.actionBackground:Hide()
-	end
+	self:SetNeedAction(self.entry.needAction)
 
 
 	self:SetMinPrice()
@@ -275,6 +271,16 @@ function MUHAPEntryMixin:InitItem()
 	self.lastChecked:SetColor(1, 1, 1, 0.5)	
 	self.lastChecked:SetValue(date("%d.%m.%y %H:%M:%S", self.entry.lastChecked ))
 
+end
+
+
+function MUHAPEntryMixin:SetNeedAction(state)
+	self.entry.needAction =  state or false
+	if self.entry.needAction  then 
+		self.actionBackground:Show()
+	else
+		self.actionBackground:Hide()
+	end
 end
 
 
@@ -359,30 +365,30 @@ function MUHAPEntryMixin:OnEvent(event, itemKey)
 
 
             local needUpdate = function(result)
-				local _, realm =  UnitFullName("player")
+				local _, realm =  UnitName("player")
+				local formattedName = MUHAP:formatPlayerName(result.owners[1], realm )
 				local match = true
-				if result.owners[1] == "player" or AuctionsPosterDB.activeChars[result.owners[1] .. "-" .. realm] or AuctionsPosterDB.activeChars[result.owners[1]] then 
+				if result.owners[1] == "player" or AuctionsPosterDB.activeChars[formattedName] or AuctionsPosterDB.activeChars[result.owners[1]] then 
 					match = false
 				end
-				
+
                 return match
             end
 
             local result = C_AuctionHouse.GetItemSearchResultInfo(itemKey, 1)
 
-			if  result then 
+			if result then 
 				self.entry.needAction = needUpdate(result)
 				self.entry.buyoutAmount = result.buyoutAmount
-	
 			else
-				self.entry.needAction = true
+				self.entry.needAction = false
+				self.entry.buyoutAmount = 0
 			end
 
 			self.entry.lastChecked = time()
 
 
 			self:InitItem()
-
 
 			AuctionHouseFrame.MUHAPFrame:UpdateList()
 
@@ -396,7 +402,9 @@ function MUHAPEntryMixin:OnEvent(event, itemKey)
 
 		self.lastAuctionTimer = C_Timer.NewTimer(3, function() 
 			print("all auctions created")
-			self:runCheck()
+			AuctionHouseFrame.MUHAPFrame:FilterList()
+			AuctionHouseFrame.MUHAPFrame:UpdateList()
+
 			self:UnregisterEvent("AUCTION_HOUSE_AUCTION_CREATED")
 		end)
 	end
@@ -410,9 +418,14 @@ function MUHAPEntryMixin:runCheck()
         return 
     end
 
-	self:RegisterEvent("ITEM_SEARCH_RESULTS_UPDATED")
+	if (self.entry.lastChecked + 5) > time() then 
+		print("runCheck too fast", self.entry.id)
+		return 
+	end
 
-	--print("runCheck",self.entry.id )
+	print("runCheck ", self.entry.id)
+
+	self:RegisterEvent("ITEM_SEARCH_RESULTS_UPDATED")
 
 
 
@@ -439,6 +452,8 @@ function MUHAPEntryMixin:PostItem()
 	local itemsAvaible = C_AuctionHouse.GetAvailablePostCount(ILocation)
 	local qty = (itemsAvaible < self.entry.qty) and itemsAvaible or self.entry.qty
 
+	
+	self:SetNeedAction(false)
 
 	self:RegisterEvent("AUCTION_HOUSE_AUCTION_CREATED")
 
@@ -477,6 +492,15 @@ function MUHAPEntryCreateButtonMixin:OnClick()
 	self:GetParent():createNewItem();
 	PlaySound(SOUNDKIT.LOOT_WINDOW_COIN_SOUND);
 end
+
+
+MUHAPEntryDeleteButtonMixin = {};
+
+function MUHAPEntryDeleteButtonMixin:OnClick()
+	self:GetParent():delete();
+	PlaySound(SOUNDKIT.LOOT_WINDOW_COIN_SOUND);
+end
+
 
 
 
@@ -521,6 +545,15 @@ function MUHAPEntrySettingsMixin:OnLoad()
 
 end
 
+function MUHAPEntrySettingsMixin:ToggleDeleteButton(state)
+	if state then 
+		self.DeleteButton:Hide()
+	else 
+		self.DeleteButton:Show()
+	end
+
+end
+
 function MUHAPEntrySettingsMixin:OnShow()
 	--print("show")
 	self.entry = self:GetParent().entry
@@ -533,6 +566,7 @@ function MUHAPEntrySettingsMixin:OnShow()
 			self.DurationDropDown:SetDuration(self.entry.duration)
 		
 			self.EnabledCheckbox:SetState(self.entry.enabled)
+			self:ToggleDeleteButton(self.entry.enabled)
 			SetItemButtonTexture(self.ItemDisplay.ItemButton, self.itemKeyInfo.iconFileID);
 			self.CreateButton:Hide()
 		else
@@ -540,6 +574,7 @@ function MUHAPEntrySettingsMixin:OnShow()
 			self.entry.minPrice = 100000
 			self.entry.qty = 1
 			self.EnabledCheckbox:Hide()
+			self:ToggleDeleteButton(true)
 			self.SettingsButton:Hide()
 		end
 
@@ -560,7 +595,6 @@ function MUHAPEntrySettingsMixin:OnShow()
 end
 
 function MUHAPEntrySettingsMixin:createNewItem()
-
 	local newId = self.ItemDisplay:GetItemID()
 	if newId then 
 		if not AuctionHouseFrame.MUHAPFrame:checkIfExits(newId) then 
@@ -572,6 +606,16 @@ function MUHAPEntrySettingsMixin:createNewItem()
 	end
 end
 
+
+function MUHAPEntrySettingsMixin:delete()
+
+	local id = self.entry.id
+	if id then 
+		if AuctionHouseFrame.MUHAPFrame:checkIfExits(id) then 
+			AuctionHouseFrame.MUHAPFrame:DeleteItem(id)
+		end
+	end
+end
 
 function MUHAPEntrySettingsMixin:OnHide()
 	--print("hide")
@@ -594,6 +638,7 @@ end
 
 function MUHAPEntrySettingsMixin:UpdateEnabled(state)
 	self.entry.enabled = state
+	--self:ToggleDeleteButton(state)
 	self:GetParent():UpdateEnabled()
 end
 
@@ -707,5 +752,29 @@ function MUHAPItemDisplayMixin:OnLoad()
 
 	self.NineSlice:Hide();
 end
+
+
+
+
+
+MUHAPFooterMixin = {};
+
+function MUHAPFooterMixin:OnLoad()
+
+end
+
+
+MUHAPFooterCheckButtonMixin = {};
+function MUHAPFooterCheckButtonMixin:OnClick()
+	AuctionHouseFrame.MUHAPFrame:triggerAllChecks()
+end
+
+
+
+MUHAPFooterPostButtonMixin = {};
+function MUHAPFooterPostButtonMixin:OnClick()
+	AuctionHouseFrame.MUHAPFrame:triggerAllPostAuctions()
+end
+
 
 

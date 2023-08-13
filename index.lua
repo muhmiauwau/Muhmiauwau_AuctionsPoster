@@ -18,7 +18,9 @@ MUHAP_TEXT_TYPE = {
 	minPrice =  "min price",
 	buyout = "buyout price",
 	lastChecked = "last checked",
-	Duration = MUHAP_DURATION_LABEL
+	Duration = MUHAP_DURATION_LABEL,
+	Auctions = "Auctions",
+	Check = "Check"
 }
 
 
@@ -95,13 +97,22 @@ function MUHAP:OnInitialize()
 	end
 
 	if #AuctionsPosterCharDB.items > 0 then 
-		local name, realm =  UnitFullName("player")
-		local nameWithRealm = name.. "-" .. realm
+		local name, realm =  UnitName("player")
+		local formattedName = self:formatPlayerName(name, realm )
 		
-		AuctionsPosterDB.activeChars[nameWithRealm] = time()
+		AuctionsPosterDB.activeChars[formattedName] = time()
 	end
 
  end 
+
+
+ function MUHAP:formatPlayerName(name, realm)
+	realm = realm or GetRealmName()
+	local nameWithRealm = name.. "-" .. realm
+	nameWithRealm = nameWithRealm:gsub("%s+", "")
+	return nameWithRealm
+ end
+ 
 
 
  
@@ -114,70 +125,46 @@ function MUHAP:OnInitialize()
  function MUHAP:AddonLoadedEvent(event, name)
     if name == "Blizzard_AuctionHouseUI" then 
 
+		MUHAP:UnregisterEvent("ADDON_LOADED")
 
-
-
-		
+		-- create schrollframe
 		AuctionHouseFrame.MUHAPFrame = CreateFrame("Frame", nil, AuctionHouseFrame, "MUHAPFrameTemplate")
 
+		-- create schrollframe
+		AuctionHouseFrame.MUHAPFooter = CreateFrame("Frame", nil, AuctionHouseFrame, "MUHAPFooterTemplate")
 
-		--for k,v in pairs(AuctionsPosterCharDB.items) do 
-		--	AuctionHouseFrame.MUHAPFrame:addEntry(v)
-		--end
+		
+	
+		-- create schrollframe
+		AuctionHouseFrame.MUHAPTabs = CreateFrame("Frame", nil, AuctionHouseFrame, "MUHAPTabsTemplate")
 
-
-
-
-
+		-- create CategoriesList 
 		AuctionHouseFrame.MUHAPCategoriesList = CreateFrame("Frame", nil, AuctionHouseFrame, "AuctionHouseMUHAPCategoriesListTemplate")
-
 		AuctionHouseFrame.MUHAPCategoriesList:SetPoint("LEFT",4, 0)
-		AuctionHouseFrame.MUHAPCategoriesList:SetPoint("TOP",0, -74)
+		AuctionHouseFrame.MUHAPCategoriesList:SetPoint("TOP",0, -73)
 
 
-
+		-- Display config
 		AuctionHouseFrameDisplayMode["MUHAP"] = {
+			"MUHAPTabs",
 			"MUHAPCategoriesList",
-			--"SearchBar",
-			"MUHAPFrame"
+			"MUHAPFrame",
+			"MUHAPFooter"
 		}
 
-		local button = CreateFrame("Button", "AuctionHouseFrame" .. "Tab" .. (#AuctionHouseFrame.Tabs +1), AuctionHouseFrame, "AuctionHouseFrameDisplayModeTabTemplate")
-		button:SetText("MUHAP")
+		-- Add Tab 
+		local tabsAmount = #AuctionHouseFrame.Tabs + 1
+		local button = CreateFrame("Button", "AuctionHouseFrameTab" .. tabsAmount, AuctionHouseFrame, "AuctionHouseFrameDisplayModeTabTemplate")
+		button:SetText("Auction Poster")
 
-		button:SetScript("OnClick", function (self, button, down)
-			PanelTemplates_SetTab(AuctionHouseFrame, 4)
+		button:SetScript("OnClick", function ()
+			PanelTemplates_SetTab(AuctionHouseFrame, tabsAmount)
 			AuctionHouseFrame:SetDisplayMode(AuctionHouseFrameDisplayMode["MUHAP"]);
 		end)
 
+		PanelTemplates_SetNumTabs(AuctionHouseFrame, tabsAmount);
 
 		
-		
-
-		--DevTools_Dump(AuctionHouseFrame.Tabs)
-		PanelTemplates_SetNumTabs(AuctionHouseFrame, 4);
-
---[[]
-
-		C_Timer.After(2, function()
-			PanelTemplates_SetTab(AuctionHouseFrame, 4)
-			AuctionHouseFrame:SetDisplayMode(AuctionHouseFrameDisplayMode["MUHAP"]);
-		end)
-
-
-		C_Timer.After(5, function()
-			print("after 5")
-			
-		    AuctionHouseFrame.MUHAPFrame.entries[2]:runCheck()
-			AuctionHouseFrame.MUHAPFrame.entries[1]:runCheck()
-		end)
-a
-
-		]]
-	
-
-		--AuctionHouseFrame:SetDisplayMode(AuctionHouseFrameDisplayMode["MUHAP"]);
-
 	end 
 end
 

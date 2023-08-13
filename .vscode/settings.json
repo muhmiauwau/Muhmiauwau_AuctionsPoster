@@ -87,6 +87,13 @@
         "DressUpTransmogLink",
         "DressUpLink",
         "AuctionHouseSellFrameItemDisplayMixin",
-        "AuctionHouseMultisellProgressFrame"
+        "AuctionHouseMultisellProgressFrame",
+        "AuctionHouseAuctionsFrameMixin",
+        "AuctionHouseBuySystemMixin",
+        "AuctionHouseSortOrderSystemMixin",
+        "AuctionHouseSearchContext",
+        "PanelTemplates_GetSelectedTab",
+        "CreateTableBuilder",
+        "AuctionHouseTableBuilderMixin"
     ]
 }

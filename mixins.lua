@@ -115,14 +115,26 @@ end
 
 
 
+function tableFindAll(table, value, key, key2)
+	local ntable = {}
 
+	for k, entry in ipairs(table) do 
+		local item = nil
+		if entry[key] then 
+			if key2 and entry[key][key2] then 
+				item = entry[key][key2]
+			else 
+				item = entry[key]
+			end
+		end
 
+		if item and item == value then 
+			ntable[#ntable + 1] = value
+		end
+	end
 
-
-
-
-
-
+	return ntable
+end
 
 
 
@@ -151,6 +163,10 @@ MUHAPScrollFrameMixin = {}
 
 function MUHAPScrollFrameMixin:OnLoad()
 
+	self.showDisabled = false
+
+	self.ticker = nil
+
 	self.selectedCategoryIndex = nil;
 	self.selectedSubCategoryIndex = nil;
 	self.selectedSubSubCategoryIndex = nil;
@@ -159,28 +175,9 @@ function MUHAPScrollFrameMixin:OnLoad()
 	self.filterdItems = {}
 
 
-
-	
-
-    --self:RegisterEvent("ITEM_KEY_ITEM_INFO_RECEIVED");
-	-- Create the scrolling parent frame and size it to fit inside the texture
-    local scrollFrame = CreateFrame("ScrollFrame", nil, self, "ScrollFrameTemplate")
-    scrollFrame:SetPoint("TOPLEFT", 0, 0)
-    scrollFrame:SetPoint("BOTTOMRIGHT", 0, 0)
-    scrollFrame.Texture = scrollFrame:CreateTexture()
-    scrollFrame.Texture:SetAllPoints()
-    scrollFrame.Texture:SetAtlas("auctionhouse-background-auctions", true);
-
-
-    -- Create the scrolling child frame, set its width to fit, and give it an arbitrary minimum height (such as 1)
-    local scrollChild = CreateFrame("Frame")
-    scrollFrame:SetScrollChild(scrollChild)
-    scrollChild:SetWidth(scrollFrame:GetWidth())
-    scrollChild:SetHeight(1) 
-
-
-    self.list = scrollChild
-
+    self.list = self.scrollFrame.ScrollBox
+	self.list:SetWidth(self.scrollFrame:GetWidth() -  8)
+	self.list:SetHeight(1) 
 
 	self:generateListFrames()
 
@@ -188,6 +185,8 @@ function MUHAPScrollFrameMixin:OnLoad()
 		self:addEntry(entry)
 	end
 end
+
+
 
 function MUHAPScrollFrameMixin:AddItem(entry)
 
@@ -217,6 +216,17 @@ function MUHAPScrollFrameMixin:AddItem(entry)
 
 end
 
+function MUHAPScrollFrameMixin:DeleteItem(id)
+	for i, entry in ipairs(self.items) do 
+		if entry.id == id then 
+			tremove(self.items, i)
+		end
+	end
+
+	self:FilterList()
+    self:UpdateList()
+end
+
 function MUHAPScrollFrameMixin:OnCategorySelected(selectedCategoryIndex, selectedSubCategoryIndex, selectedSubSubCategoryIndex)
     self.selectedCategoryIndex = selectedCategoryIndex;
 	self.selectedSubCategoryIndex = selectedSubCategoryIndex;
@@ -234,24 +244,38 @@ function MUHAPScrollFrameMixin:FilterList()
 
 	for _, entry in pairs(self.items) do 
 
+		local item = nil
+
 		local Category = entry.Category
 		local SubCategory = entry.SubCategory
 		local SubSubCategory = entry.SubSubCategory
 
 		if self.selectedCategoryIndex == nil  then
-			filterdItems[#filterdItems + 1] = entry
+			item = entry
 		elseif self.selectedSubCategoryIndex == nil then
 			if self.selectedCategoryIndex == Category then 
-				filterdItems[#filterdItems + 1] = entry
+				item = entry
 			end
 		elseif self.selectedSubSubCategoryIndex == nil then
 			if self.selectedCategoryIndex == Category and self.selectedSubCategoryIndex == SubCategory then 
-				filterdItems[#filterdItems + 1] = entry
+				item= entry
 			end
 		else
 			if self.selectedCategoryIndex == Category  and self.selectedSubCategoryIndex == SubCategory and self.selectedSubSubCategoryIndex == SubSubCategory then 
-				filterdItems[#filterdItems + 1] = entry
+				item = entry
 			end
+		end
+
+		if item ~= nil then
+			print("in filter", self.showDisabled, item.enabled, item.id)
+			if not self.showDisabled and not item.enabled then 
+				item = nil
+			elseif self.showDisabled and item.enabled then  
+				item = nil
+			end
+
+			item = self:checkStatus(item)
+			filterdItems[#filterdItems + 1] = item
 		end
 	end
 
@@ -259,6 +283,19 @@ function MUHAPScrollFrameMixin:FilterList()
 	self.filterdItems = filterdItems
 end
 
+
+
+function MUHAPScrollFrameMixin:checkStatus(entry)
+	if not entry then return end
+	if not entry.enabled then return end
+
+	entry.status = entry.status or {auction = false, check = false}
+
+	entry.status.check = (entry.lastChecked + 60) < time()
+	entry.status.auction = entry.needAction
+
+	return entry
+end
 
 function MUHAPScrollFrameMixin:SortList()
 
@@ -272,8 +309,13 @@ function MUHAPScrollFrameMixin:SortList()
 end
 
 function MUHAPScrollFrameMixin:OnShow()
-	self:FilterList()
-	self:UpdateList()
+	if self.ticker then
+		self.ticker:Cancel()
+	end
+
+	self.ticker = C_Timer.NewTimer(60, function ()
+		self:triggerAllChecks()
+	end)
 end
 
 
@@ -281,6 +323,10 @@ function MUHAPScrollFrameMixin:OnEvent(event, ...)
 end
 
 function MUHAPScrollFrameMixin:OnHide()
+
+	if self.ticker then
+		self.ticker:Cancel()
+	end
 end
 
 
@@ -295,7 +341,21 @@ function MUHAPScrollFrameMixin:checkIfExits(id)
 end
 
 function MUHAPScrollFrameMixin:UpdateList()
-	--print("UpdateList")
+
+	self.statusAuctions = tableFindAll(self.filterdItems, true, "status", "auction")
+	self.statusCheck = tableFindAll(self.filterdItems, true, "status", "check")
+
+	self:GetParent().MUHAPFooter.TextAuctions:SetValue(#self.statusAuctions)
+	self:GetParent().MUHAPFooter.TextCheck:SetValue(#self.statusCheck)
+
+	if #self.statusCheck == 0 and #self.statusAuctions > 0 then
+		self:GetParent().MUHAPFooter.PostButton:SetEnabled(true);
+		self:GetParent().MUHAPFooter.PostButton:Show()
+	else
+		self:GetParent().MUHAPFooter.PostButton:Hide()
+	end
+
+
 	self:ResetList()
 	self:SortList()
 
@@ -400,6 +460,40 @@ function MUHAPScrollFrameMixin:OnEvent(event, ...)
 end
 
 
+function MUHAPScrollFrameMixin:triggerAllChecks()
+	print("triggerAllChecks")
+
+
+	for i, entry in ipairs(self.filterdItems) do 
+		local frame = _G["MUHAPEntryFrame" .. entry.id]
+		frame:runCheck()
+	end
+
+	C_Timer.After(3, function() 
+		self:FilterList()
+		self:UpdateList()
+	end)
+
+ end
+
+ function MUHAPScrollFrameMixin:triggerAllPostAuctions()
+	print("triggerAllPostAuctions")
+	
+	if #self.filterdItems > 0 then 
+
+		local entry = self.filterdItems[1]
+
+		local frame = _G["MUHAPEntryFrame" .. entry.id]
+		frame:PostItem()
+
+		self:GetParent().MUHAPFooter.PostButton:SetEnabled(false);
+		entry.status.auction = false
+	end
+
+
+ end
+
+ 
 
 
 
@@ -420,3 +514,34 @@ end
 
 
 
+
+
+MUHAPTabsMixin = {};
+
+
+
+function MUHAPTabsMixin:GetTab()
+	return PanelTemplates_GetSelectedTab(self);
+end
+
+function MUHAPTabsMixin:SetTab(tabID)
+	if self:GetTab() == tabID then
+		return;
+	end
+	PanelTemplates_SetTab(self, tabID);
+
+	local ScrollFrame = self:GetParent().MUHAPFrame
+
+	ScrollFrame.showDisabled = (tabID == 2) and true or false
+
+	ScrollFrame:FilterList()
+	ScrollFrame:UpdateList()
+
+end
+
+function MUHAPTabsMixin:OnLoad()
+	PanelTemplates_SetNumTabs(self, 2);
+	self:SetTab(1);
+
+
+end

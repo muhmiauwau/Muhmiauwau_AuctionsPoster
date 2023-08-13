@@ -5,7 +5,123 @@
     <Script file="MUHAPEntryMixin.lua"/>
 
 
-    <Frame name="MUHAPFrameTemplate" mixin="MUHAPScrollFrameMixin"  virtual="true">
+	<Frame name="MUHAPFrameTemplate" mixin="MUHAPScrollFrameMixin" inherits="AuctionHouseBackgroundTemplate"  virtual="true">
+		<Frames>
+
+			<ScrollFrame parentKey="scrollFrame" inherits="ScrollFrameTemplate">
+				
+				<ScrollChild>
+					<Frame parentKey="ScrollBox" >
+					</Frame>
+				</ScrollChild>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="8" y="-8"/>
+					<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="1" y="8"/>
+				</Anchors>
+			</ScrollFrame>
+		
+			
+		</Frames>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Background" atlas="auctionhouse-background-index" useAtlasSize="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="3" y="-3"/>
+						<Anchor point="BOTTOMRIGHT" x="-3" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeKey="$parent.CategoriesList" relativePoint="TOPRIGHT" x="0" y="0"/>
+			<Anchor point="BOTTOMLEFT" relativeKey="$parent.CategoriesList" relativePoint="BOTTOMRIGHT" x="8" y="0"/>
+			<Anchor point="RIGHT" x="-27" y="0"/>
+		</Anchors>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+			<OnEvent method="OnEvent"/>
+			<OnHide method="OnHide"/>
+            <OnHide method="OnShow"/>
+		</Scripts>
+	</Frame>
+
+
+
+
+	<Frame name="MUHAPFooterTemplate" mixin="MUHAPFooterMixin"  virtual="true">
+		<Frames>
+
+			<Frame parentKey="TextAuctions" inherits="MUHAPEntryTextTemplate">
+                <KeyValues>
+                    <KeyValue key="type" value="MUHAP_TEXT_TYPE.Auctions" type="global"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-170" y="-5" />
+                </Anchors>
+            </Frame>
+
+			<Frame parentKey="TextCheck" inherits="MUHAPEntryTextTemplate">
+                <KeyValues>
+                    <KeyValue key="type" value="MUHAP_TEXT_TYPE.Check" type="global"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-170" y="5" />
+                </Anchors>
+            </Frame>
+
+
+
+			<Button parentKey="PostButton"  mixin="MUHAPFooterPostButtonMixin"  frameLevel="320"  inherits="UIPanelButtonTemplate" text="Post Auctions"  hidden="true">
+				<Size x="158" y="22"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="0" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnClick method="OnClick"/>
+				</Scripts>
+			</Button>
+			<Button parentKey="CheckButton"  mixin="MUHAPFooterCheckButtonMixin"  frameLevel="300"  inherits="UIPanelButtonTemplate" text="Run Check" >
+				<Size x="158" y="22"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="0" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnClick method="OnClick"/>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeKey="$parent.MUHAPFrame" relativePoint="BOTTOMRIGHT" x="25" y="0"/>
+			<Anchor point="BOTTOMLEFT" relativeKey="$parent.MUHAPFrame" relativePoint="BOTTOMLEFT" x="0" y="-24"/>
+		</Anchors>
+		
+	</Frame>
+
+
+	<Frame name="MUHAPTabsTemplate" mixin="MUHAPTabsMixin"  virtual="true">
+		<Frames>
+			<Button name="$parentEnabledTab" parentKey="EnabledTab" id="1" inherits="AuctionHouseAuctionsFrameTabTemplate"  frameLevel="300" text="Enabled">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" x="0" y="0"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentDisabledTab" parentKey="DisabledTab" id="2" inherits="AuctionHouseAuctionsFrameTabTemplate" useParentLevel="true" text="Disabled">
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.EnabledTab" relativePoint="RIGHT" x="0" y="0"/>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeKey="$parent.MUHAPFrame" relativePoint="TOPRIGHT" x="0" y="50"/>
+			<Anchor point="BOTTOMLEFT" relativeKey="$parent.MUHAPFrame" relativePoint="TOPLEFT" x="0" y="0"/>
+		</Anchors>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+		</Scripts>
+	</Frame>
+
+
+    <Frame name="MUHAPFrameTemplate2" mixin="MUHAPScrollFrameMixin"  virtual="true">
         <Anchors>
             <Anchor point="TOPLEFT" relativeKey="$parent.CategoriesList" relativePoint="TOPRIGHT" x="0" y="0"/>
             <Anchor point="BOTTOMLEFT" relativeKey="$parent.CategoriesList" relativePoint="BOTTOMRIGHT" x="8" y="0"/>
@@ -319,6 +435,17 @@
 			</Frame>
 
 
+			<Button parentKey="DeleteButton" mixin="MUHAPEntryDeleteButtonMixin" inherits="UIPanelButtonTemplate" text="Delete">
+				<Size x="80" y="22"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.PriceInput" relativePoint="RIGHT" x="190" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnClick method="OnClick"/>
+				</Scripts>
+			</Button>
+
+
  			<Button parentKey="CreateButton" mixin="MUHAPEntryCreateButtonMixin" inherits="UIPanelButtonTemplate" text="MUHAP_CREATE_BUTTON">
 				<Size x="194" y="22"/>
 				<Anchors>
@@ -382,7 +509,7 @@
 				<Anchors>
 					<Anchor point="TOP" relativeKey="$parent.SettingsButton" relativePoint="BOTTOM" x="0" y="0"/>
 				</Anchors>
-                <NormalTexture atlas="VignetteEvent"/>
+                <NormalTexture atlas="UI-RefreshButton"  />
 
                 <Scripts>
                    <OnClick method="reload"/>
@@ -589,6 +716,7 @@
 			<Scripts>
 				<OnLoad method="OnLoad"/>
 				<OnShow method="OnShow"/>
+				<OnShow method="OnHide"/>
 			</Scripts>
 	</Frame>
 </Ui>
