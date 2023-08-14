@@ -334,6 +334,7 @@ function MUHAPEntryMixin:SetAvailable()
 
 	if bagId == false then
 		self.TextAvailable:SetValue(0)
+		self.entry.enabled = false
 	else
 		local amount = C_AuctionHouse.GetAvailablePostCount(ItemLocation:CreateFromBagAndSlot(bagId, slotId))
 		self.TextAvailable:SetValue(amount)
@@ -400,7 +401,7 @@ function MUHAPEntryMixin:OnEvent(event, itemKey)
 				else
 					match = false
 				end
-				
+
 				if self.entry.minPrice > result[priceKey] then 
 					match = false
 				end
