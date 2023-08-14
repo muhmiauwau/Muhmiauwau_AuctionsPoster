@@ -18,11 +18,6 @@ libs\AceLocale-3.0\AceLocale-3.0.xml
 
 
 
-
-Blizzard_AuctionHouseSharedTemplates.xml
-frames.xml
-
 Components/index.xml
-
 index.lua
 

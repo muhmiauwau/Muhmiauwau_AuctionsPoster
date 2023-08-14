@@ -1,9 +1,13 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\..\FrameXML\UI.xsd">
 
+
+	<Include file="Blizzard_AuctionHouseSharedTemplates\Blizzard_AuctionHouseSharedTemplates.xml"/>
 	<Include file="CreateNew\CreateNew.xml"/>
     <Include file="Tabs\Tabs.xml"/>
     <Include file="Footer\Footer.xml"/>
     <Include file="CategoriesList\CategoriesList.xml"/>
     <Include file="ScrollFrame\ScrollFrame.xml"/>
+    <Include file="Entry\Entry.xml"/>
+    <Include file="EntrySettings\EntrySettings.xml"/>
 </Ui>
