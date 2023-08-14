@@ -628,10 +628,8 @@ function MUHAPEntrySettingsMixin:OnShow()
 	if self.entry then 
 		if self.entry.id then
 			self.DurationDropDown:SetDuration(self.entry.duration)
-		
 			self.EnabledCheckbox:SetState(self.entry.enabled)
 			self:ToggleDeleteButton(self.entry.enabled)
-			SetItemButtonTexture(self.ItemDisplay.ItemButton, self.itemKeyInfo.iconFileID);
 			self.CreateButton:Hide()
 		else
 			self.entry.duration = 1
@@ -645,29 +643,9 @@ function MUHAPEntrySettingsMixin:OnShow()
 		self.DurationDropDown:SetDuration(self.entry.duration)
 		self.QuantityInput:SetQuantity(self.entry.qty)
 		self.PriceInput:SetAmount(self.entry.minPrice)
-
-		self.ItemDisplay:SetOnItemChangedCallback(function(itemLocation)
-	
-			if C_AuctionHouse.IsSellItemValid(itemLocation) == false or  AuctionHouseFrame.MUHAP.ScrollFrame:checkIfExits(self.ItemDisplay:GetItemID()) then 
-				C_Item.UnlockItem(itemLocation);
-				self.ItemDisplay:Reset()
-			end
-		end)
 	end
 
 
-end
-
-function MUHAPEntrySettingsMixin:createNewItem()
-	local newId = self.ItemDisplay:GetItemID()
-	if newId then 
-		if not AuctionHouseFrame.MUHAP.ScrollFrame:checkIfExits(newId) then 
-			--print("createNewItem")
-			self.entry.id = newId
-			self:Hide()
-			AuctionHouseFrame.MUHAP.ScrollFrame:AddItem(self.entry)
-		end
-	end
 end
 
 
@@ -809,23 +787,6 @@ end
 
 
 
-MUHAPItemDisplayMixin = {};
-
-function MUHAPItemDisplayMixin:OnLoad()
-	AuctionHouseInteractableItemDisplayMixin.OnLoad(self);
-
-	self.NineSlice:Hide();
-end
-
-
-
-
-
-MUHAPFooterMixin = {};
-
-function MUHAPFooterMixin:OnLoad()
-
-end
 
 
 MUHAPFooterCheckButtonMixin = {};

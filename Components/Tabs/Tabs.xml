@@ -1,0 +1,29 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\FrameXML\UI.xsd">
+
+	<Script file="Tabs.lua"/>
+
+    <Frame name="MUHAPTabsTemplate" mixin="MUHAPTabsMixin"  virtual="true">
+		<Frames>
+			<Button name="$parentEnabledTab" parentKey="EnabledTab" id="1" inherits="AuctionHouseAuctionsFrameTabTemplate"  frameLevel="300" text="Enabled">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" x="0" y="0"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentDisabledTab" parentKey="DisabledTab" id="2" inherits="AuctionHouseAuctionsFrameTabTemplate" useParentLevel="true" text="Disabled">
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.EnabledTab" relativePoint="RIGHT" x="0" y="0"/>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeKey="$parent.ScrollFrame" relativePoint="TOPRIGHT" x="0" y="50"/>
+			<Anchor point="BOTTOMLEFT" relativeKey="$parent.ScrollFrame" relativePoint="TOPLEFT" x="0" y="0"/>
+		</Anchors>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+		</Scripts>
+	</Frame>
+
+
+</Ui>

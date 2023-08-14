@@ -61,86 +61,6 @@
 
 
 
-
-
-
-	<Frame name="MUHAPFooterTemplate" mixin="MUHAPFooterMixin"  virtual="true">
-		<Frames>
-
-			<Frame parentKey="TextAuctions" inherits="MUHAPEntryTextTemplate">
-                <KeyValues>
-                    <KeyValue key="type" value="MUHAP_TEXT_TYPE.Auctions" type="global"/>
-                </KeyValues>
-                <Anchors>
-                    <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-170" y="-5" />
-                </Anchors>
-            </Frame>
-
-			<Frame parentKey="TextCheck" inherits="MUHAPEntryTextTemplate">
-                <KeyValues>
-                    <KeyValue key="type" value="MUHAP_TEXT_TYPE.Check" type="global"/>
-                </KeyValues>
-                <Anchors>
-                    <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-170" y="5" />
-                </Anchors>
-            </Frame>
-
-
-
-			<Button parentKey="PostButton"  mixin="MUHAPFooterPostButtonMixin"  frameLevel="320"  inherits="UIPanelButtonTemplate" text="Post Auctions"  hidden="true">
-				<Size x="158" y="22"/>
-				<Anchors>
-					<Anchor point="TOPRIGHT" x="0" y="0"/>
-				</Anchors>
-				<Scripts>
-					<OnClick method="OnClick"/>
-				</Scripts>
-			</Button>
-			<Button parentKey="CheckButton"  mixin="MUHAPFooterCheckButtonMixin"  frameLevel="300"  inherits="UIPanelButtonTemplate" text="Run Check" >
-				<Size x="158" y="22"/>
-				<Anchors>
-					<Anchor point="TOPRIGHT" x="0" y="0"/>
-				</Anchors>
-				<Scripts>
-					<OnClick method="OnClick"/>
-				</Scripts>
-			</Button>
-		</Frames>
-		<Anchors>
-			<Anchor point="TOPRIGHT" relativeKey="$parent.ScrollFrame" relativePoint="BOTTOMRIGHT" x="25" y="0"/>
-			<Anchor point="BOTTOMLEFT" relativeKey="$parent.ScrollFrame" relativePoint="BOTTOMLEFT" x="0" y="-24"/>
-		</Anchors>
-		
-	</Frame>
-
-
-
-
-	<Frame name="MUHAPTabsTemplate" mixin="MUHAPTabsMixin"  virtual="true">
-		<Frames>
-			<Button name="$parentEnabledTab" parentKey="EnabledTab" id="1" inherits="AuctionHouseAuctionsFrameTabTemplate"  frameLevel="300" text="Enabled">
-				<Anchors>
-					<Anchor point="BOTTOMLEFT" x="0" y="0"/>
-				</Anchors>
-			</Button>
-			<Button name="$parentDisabledTab" parentKey="DisabledTab" id="2" inherits="AuctionHouseAuctionsFrameTabTemplate" useParentLevel="true" text="Disabled">
-				<Anchors>
-					<Anchor point="LEFT" relativeKey="$parent.EnabledTab" relativePoint="RIGHT" x="0" y="0"/>
-				</Anchors>
-			</Button>
-		</Frames>
-		<Anchors>
-			<Anchor point="TOPRIGHT" relativeKey="$parent.ScrollFrame" relativePoint="TOPRIGHT" x="0" y="50"/>
-			<Anchor point="BOTTOMLEFT" relativeKey="$parent.ScrollFrame" relativePoint="TOPLEFT" x="0" y="0"/>
-		</Anchors>
-		<Scripts>
-			<OnLoad method="OnLoad"/>
-		</Scripts>
-	</Frame>
-
-
-
-
 	<Frame name="AuctionHouseSellFrameAlignedControlTemplate" mixin="AuctionHouseSellFrameAlignedControlMixin" virtual="true">
 		<Size x="200" y="30"/>
 		<!-- You can set the label text with a key value:
@@ -386,16 +306,7 @@
 
 
 
-			<Button parentKey="ItemDisplay" inherits="AuctionHouseInteractableItemDisplayTemplate" mixin="MUHAPItemDisplayMixin" >
-				<Size x="70" y="100"/>
-				<Anchors>
-					<Anchor point="LEFT" x="0" y="0"/>
-				</Anchors>
-				<Scripts>
-					<OnLoad method="OnLoad"/>
-				</Scripts>
-			</Button>
-
+		
 
 		
 

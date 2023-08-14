@@ -124,9 +124,9 @@ function MUHAP:OnInitialize()
 
  function MUHAP:AddonLoadedEvent(event, name)
     if name == "Blizzard_AuctionHouseUI" then 
+		self:UnregisterEvent(event)
 
-		MUHAP:UnregisterEvent("ADDON_LOADED")
-
+	
 		-- create Parent
 		AuctionHouseFrame.MUHAP = CreateFrame("Frame", nil, AuctionHouseFrame)
 		AuctionHouseFrame.MUHAP:SetPoint("TOPLEFT", 0, 0)
@@ -149,8 +149,6 @@ function MUHAP:OnInitialize()
 
 
 		
-
-
 		-- Display config
 		AuctionHouseFrameDisplayMode["MUHAP"] = {
 			"MUHAP"
@@ -167,8 +165,6 @@ function MUHAP:OnInitialize()
 		end)
 
 		PanelTemplates_SetNumTabs(AuctionHouseFrame, tabsAmount);
-
-
 	end 
 end
 
