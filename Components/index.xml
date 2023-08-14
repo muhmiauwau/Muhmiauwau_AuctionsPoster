@@ -4,5 +4,5 @@
 	<Include file="CreateNew\CreateNew.xml"/>
     <Include file="Tabs\Tabs.xml"/>
     <Include file="Footer\Footer.xml"/>
-
+    <Include file="CategoriesList\CategoriesList.xml"/>
 </Ui>

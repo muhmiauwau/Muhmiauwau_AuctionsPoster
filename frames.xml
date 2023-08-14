@@ -599,44 +599,4 @@
         </Scripts>
     </Frame>
 
-
-    <Frame name="AuctionHouseMUHAPCategoriesListTemplate" mixin="AuctionHouseMUHAPCategoriesListMixin" virtual="true">
-		<Size x="168" y="438"/>
-		<KeyValues>
-			<KeyValue key="layoutType" value="InsetFrameTemplate" type="string"/>
-		</KeyValues>
-		<Frames>
-			<Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate"/>
-
-			<Frame parentKey="ScrollBox" inherits="WowScrollBoxList">
-				<Anchors>
-					<Anchor point="TOPLEFT" x="3" y="-6"/>
-					<Anchor point="BOTTOMRIGHT" x="-25" y="2"/>
-				</Anchors>
-			</Frame>
-			<EventFrame parentKey="ScrollBar" inherits="MinimalScrollBar">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeKey="$parent.ScrollBox" relativePoint="TOPRIGHT" x="6" y="0"/>
-					<Anchor point="BOTTOMLEFT" relativeKey="$parent.ScrollBox" relativePoint="BOTTOMRIGHT" x="6" y="4"/>
-				</Anchors>
-			</EventFrame>
-		</Frames>
-		<Layers>
-			<Layer level="BACKGROUND">
-				<Texture parentKey="Background" atlas="auctionhouse-background-categories" useAtlasSize="true">
-					<Anchors>
-						<Anchor point="TOPLEFT" x="3" y="-3"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-		<Anchors>
-			<Anchor point="LEFT" x="4" y="0"/>
-			<Anchor point="TOP" x="0" y="-73"/>
-		</Anchors>
-		<Scripts>
-			<OnLoad method="OnLoad"/>
-			<OnShow method="OnShow"/>
-		</Scripts>
-	</Frame>
 </Ui>

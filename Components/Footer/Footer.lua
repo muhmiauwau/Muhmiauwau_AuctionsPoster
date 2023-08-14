@@ -5,7 +5,4 @@ function Footer:OnLoad()
 
 end
 
-
-
-
 MUHAPFooterMixin = Footer

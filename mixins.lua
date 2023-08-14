@@ -1,109 +1,3 @@
-AuctionHouseSystemMixin = {};
-
-function AuctionHouseSystemMixin:GetAuctionHouseFrame()
-	return self:GetParent();
-end
-
-
-
-
-AuctionHouseCategoriesListMixin = CreateFromMixins(AuctionHouseSystemMixin);
-
-function AuctionHouseCategoriesListMixin:OnLoad()
-	local view = CreateScrollBoxListLinearView();
-	view:SetElementInitializer("AuctionCategoryButtonTemplate", function(button, elementData)
-		AuctionHouseFilterButton_SetUp(button, elementData);
-		button:SetScript("OnClick", function(button, buttonName)
-			self:OnFilterClicked(button, buttonName);
-		end);
-	end);
-	local leftPad = 3;
-	local spacing = 0;
-	view:SetPadding(0,0,leftPad,0,spacing);
-
-	ScrollUtil.InitScrollBoxListWithScrollBar(self.ScrollBox, self.ScrollBar, view);
-end
-
-function AuctionHouseCategoriesListMixin:OnFilterClicked(button, buttonName)
-	local selectedCategoryIndex, selectedSubCategoryIndex, selectedSubSubCategoryIndex = self:GetSelectedCategory();
-	if ( button.type == "category" ) then
-		local wasToken = AuctionFrame_DoesCategoryHaveFlag("WOW_TOKEN_FLAG", selectedCategoryIndex);
-		if ( selectedCategoryIndex == button.categoryIndex ) then
-			selectedCategoryIndex = nil;
-		else
-			selectedCategoryIndex = button.categoryIndex;
-		end
-		selectedSubCategoryIndex = nil;
-		selectedSubSubCategoryIndex = nil;
-	elseif ( button.type == "subCategory" ) then
-		if ( selectedSubCategoryIndex == button.subCategoryIndex ) then
-			selectedSubCategoryIndex = nil;
-			selectedSubSubCategoryIndex = nil;
-		else
-			selectedSubCategoryIndex = button.subCategoryIndex;
-			selectedSubSubCategoryIndex = nil;
-		end
-	elseif ( button.type == "subSubCategory" ) then
-		if ( selectedSubSubCategoryIndex == button.subSubCategoryIndex ) then
-			selectedSubSubCategoryIndex = nil;
-		else
-			selectedSubSubCategoryIndex = button.subSubCategoryIndex;
-		end
-	end
-
-	self:SetSelectedCategory(selectedCategoryIndex, selectedSubCategoryIndex, selectedSubSubCategoryIndex);
-	AuctionFrameFilters_Update(self, true);
-end
-
-function AuctionHouseCategoriesListMixin:OnShow()
-	AuctionFrameFilters_Update(self);
-end
-
-function AuctionHouseCategoriesListMixin:IsWoWTokenCategorySelected()
-	local categoryInfo = AuctionHouseCategory_FindDeepest(self.selectedCategoryIndex, self.selectedSubCategoryIndex, self.selectedSubSubCategoryIndex);
-	return categoryInfo and categoryInfo:HasFlag("WOW_TOKEN_FLAG");
-end
-
-function AuctionHouseCategoriesListMixin:SetSelectedCategory(selectedCategoryIndex, selectedSubCategoryIndex, selectedSubSubCategoryIndex)
-	self.selectedCategoryIndex = selectedCategoryIndex;
-	self.selectedSubCategoryIndex = selectedSubCategoryIndex;
-	self.selectedSubSubCategoryIndex = selectedSubSubCategoryIndex;
-
-	self:GetAuctionHouseFrame():TriggerEvent(AuctionHouseFrameMixin.Event.CategorySelected, selectedCategoryIndex, selectedSubCategoryIndex, selectedSubSubCategoryIndex);
-	
-	local displayMode = self:GetAuctionHouseFrame():GetDisplayMode();
-	if self:IsWoWTokenCategorySelected() and displayMode ~= AuctionHouseFrameDisplayMode.WoWTokenBuy then
-		self:GetAuctionHouseFrame():SetDisplayMode(AuctionHouseFrameDisplayMode.WoWTokenBuy);
-	elseif displayMode ~= AuctionHouseFrameDisplayMode.Buy and displayMode ~= AuctionHouseFrameDisplayMode.ItemBuy and displayMode ~= AuctionHouseFrameDisplayMode.CommoditiesBuy then
-		self:GetAuctionHouseFrame():SetDisplayMode(AuctionHouseFrameDisplayMode.Buy);
-	end
-
-	AuctionFrameFilters_Update(self);
-end
-
-function AuctionHouseCategoriesListMixin:GetSelectedCategory()
-	return self.selectedCategoryIndex, self.selectedSubCategoryIndex, self.selectedSubSubCategoryIndex;
-end
-
-function AuctionHouseCategoriesListMixin:GetCategoryData()
-	local selectedCategoryIndex, selectedSubCategoryIndex, selectedSubSubCategoryIndex = self:GetSelectedCategory();
-	if selectedCategoryIndex and selectedSubCategoryIndex and selectedSubSubCategoryIndex then
-		return AuctionCategories[selectedCategoryIndex].subCategories[selectedSubCategoryIndex].subCategories[selectedSubSubCategoryIndex];
-	elseif selectedCategoryIndex and selectedSubCategoryIndex then
-		return AuctionCategories[selectedCategoryIndex].subCategories[selectedSubCategoryIndex];
-	elseif selectedCategoryIndex then
-		return AuctionCategories[selectedCategoryIndex];
-	end
-end
-
-function AuctionHouseCategoriesListMixin:GetCategoryFilterData()
-	local categoryData = self:GetCategoryData();
-	if categoryData == nil then
-		return nil, nil;
-	end
-
-	return categoryData.filters, categoryData.implicitFilter;
-end
 
 
 
@@ -227,20 +121,14 @@ function MUHAPScrollFrameMixin:DeleteItem(id)
     self:UpdateList()
 end
 
-function MUHAPScrollFrameMixin:OnCategorySelected(selectedCategoryIndex, selectedSubCategoryIndex, selectedSubSubCategoryIndex)
-    self.selectedCategoryIndex = selectedCategoryIndex;
-	self.selectedSubCategoryIndex = selectedSubCategoryIndex;
-	self.selectedSubSubCategoryIndex = selectedSubSubCategoryIndex;
-
-	print(selectedCategoryIndex, selectedSubCategoryIndex, selectedSubSubCategoryIndex)
-
-	self:FilterList()
-    self:UpdateList()
-end
 
 function MUHAPScrollFrameMixin:FilterList()
 	--print("FilterList", self.selectedCategoryIndex, self.selectedSubCategoryIndex, self.selectedSubSubCategoryIndex)
 	local filterdItems = {}
+
+	local selectedCategoryIndex = MUHAP.CategoriesList.selectedCategoryIndex
+	local selectedSubCategoryIndex = MUHAP.CategoriesList.selectedSubCategoryIndex
+	local selectedSubSubCategoryIndex = MUHAP.CategoriesList.selectedSubSubCategoryIndex
 
 	for _, entry in pairs(self.items) do 
 
@@ -250,18 +138,18 @@ function MUHAPScrollFrameMixin:FilterList()
 		local SubCategory = entry.SubCategory
 		local SubSubCategory = entry.SubSubCategory
 
-		if self.selectedCategoryIndex == nil  then
+		if selectedCategoryIndex == nil  then
 			item = entry
-		elseif self.selectedSubCategoryIndex == nil then
-			if self.selectedCategoryIndex == Category then 
+		elseif selectedSubCategoryIndex == nil then
+			if selectedCategoryIndex == Category then 
 				item = entry
 			end
-		elseif self.selectedSubSubCategoryIndex == nil then
-			if self.selectedCategoryIndex == Category and self.selectedSubCategoryIndex == SubCategory then 
+		elseif selectedSubSubCategoryIndex == nil then
+			if selectedCategoryIndex == Category and selectedSubCategoryIndex == SubCategory then 
 				item= entry
 			end
 		else
-			if self.selectedCategoryIndex == Category  and self.selectedSubCategoryIndex == SubCategory and self.selectedSubSubCategoryIndex == SubSubCategory then 
+			if selectedCategoryIndex == Category  and selectedSubCategoryIndex == SubCategory and selectedSubSubCategoryIndex == SubSubCategory then 
 				item = entry
 			end
 		end
@@ -471,26 +359,5 @@ function MUHAPScrollFrameMixin:triggerAllChecks()
 
 
  end
-
- 
-
-
-
-
-
-
-
-AuctionHouseMUHAPCategoriesListMixin = CreateFromMixins(AuctionHouseCategoriesListMixin);
-
-
-function AuctionHouseMUHAPCategoriesListMixin:SetSelectedCategory(selectedCategoryIndex, selectedSubCategoryIndex, selectedSubSubCategoryIndex)
-    self.selectedCategoryIndex = selectedCategoryIndex;
-	self.selectedSubCategoryIndex = selectedSubCategoryIndex;
-	self.selectedSubSubCategoryIndex = selectedSubSubCategoryIndex;
-    AuctionHouseFrame.MUHAP.ScrollFrame:OnCategorySelected(selectedCategoryIndex, selectedSubCategoryIndex, selectedSubSubCategoryIndex)
-	AuctionFrameFilters_Update(self);
-end
-
-
 
 
