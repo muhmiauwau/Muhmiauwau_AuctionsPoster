@@ -2,6 +2,56 @@
 ..\..\FrameXML\UI.xsd">
 	<Script file="Blizzard_AuctionHouseSharedTemplates.lua"/>
 
+
+
+	<Frame name="AuctionHouseSellFrameAlignedControlTemplate" mixin="AuctionHouseSellFrameAlignedControlMixin" virtual="true">
+		<Size x="200" y="30"/>
+		<!-- You can set the label text with a key value:
+		<KeyValues>
+			<KeyValue key="labelText" value="AUCTION_HOUSE_UNIT_PRICE_LABEL" type="global"/>
+		</KeyValues>
+		-->
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString parentKey="Label" inherits="GameFontNormal" justifyH="RIGHT">
+					<Size x="93" y="0"/>
+					<Anchors>
+						<Anchor point="LEFT"/>
+					</Anchors>
+					<Color color="NORMAL_FONT_COLOR"/>
+					<Shadow x="1" y="-1">
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+				</FontString>
+				<FontString parentKey="LabelTitle" inherits="GameFontNormal" justifyH="RIGHT" hidden="true">
+					<Size x="90" y="0"/>
+					<Anchors>
+						<Anchor point="LEFT" x="0" y="7"/>
+					</Anchors>
+					<Color color="NORMAL_FONT_COLOR"/>
+					<Shadow x="1" y="-1">
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+				</FontString>
+				<FontString parentKey="Subtext" inherits="GameFontNormalSmall" justifyH="RIGHT" hidden="true">
+					<Size x="90" y="0"/>
+					<Anchors>
+						<Anchor point="TOP" relativeKey="$parent.LabelTitle" relativePoint="BOTTOM" x="0" y="-1"/>
+						<Anchor point="LEFT" x="0" y="-6"/>
+					</Anchors>
+					<Color color="DISABLED_FONT_COLOR"/>
+					<Shadow x="1" y="-1">
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+		</Scripts>
+	</Frame>
+
+	
 	<Frame name="AuctionHouseBackgroundTemplate" mixin="AuctionHouseBackgroundMixin" virtual="true">
 		<KeyValues>
 			<KeyValue key="layoutType" value="InsetFrameTemplate" type="string"/>

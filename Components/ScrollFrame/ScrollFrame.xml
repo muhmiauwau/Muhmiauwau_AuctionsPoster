@@ -1,0 +1,44 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\FrameXML\UI.xsd">
+
+    <Include file="ScrollFrameListItem\ScrollFrameListItem.xml"/>
+	<Script file="ScrollFrame.lua"/>
+
+    <Frame name="MUHAPScrollFrameTemplate" mixin="MUHAPScrollFrameMixin" inherits="AuctionHouseBackgroundTemplate"  virtual="true">
+		<Frames>
+			<ScrollFrame parentKey="scrollFrame" inherits="ScrollFrameTemplate">
+				<ScrollChild>
+					<Frame parentKey="ScrollBox" >
+					</Frame>
+				</ScrollChild>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="8" y="-8"/>
+					<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="1" y="8"/>
+				</Anchors>
+			</ScrollFrame>
+		</Frames>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Background" atlas="auctionhouse-background-index" useAtlasSize="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="3" y="-3"/>
+						<Anchor point="BOTTOMRIGHT" x="-3" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Anchors>
+		<Anchor point="TOPLEFT" relativeKey="$parent.CategoriesList" relativePoint="TOPRIGHT" x="0" y="0"/>
+			<Anchor point="BOTTOMLEFT" relativeKey="$parent.CategoriesList" relativePoint="BOTTOMRIGHT" x="8" y="0"/>
+			<Anchor point="RIGHT" x="-27" y="0"/>
+		</Anchors>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+			<OnEvent method="OnEvent"/>
+			<OnHide method="OnHide"/>
+            <OnHide method="OnShow"/>
+		</Scripts>
+	</Frame>
+ 
+
+</Ui>

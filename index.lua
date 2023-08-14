@@ -137,7 +137,7 @@ function MUHAP:OnInitialize()
 		AuctionHouseFrame.MUHAP.CategoriesList = MUHAP.CategoriesList
 
 		-- create MUHAPFrame
-		MUHAP.ScrollFrame = CreateFrame("Frame", nil, AuctionHouseFrame.MUHAP, "MUHAPFrameTemplate")
+		MUHAP.ScrollFrame = CreateFrame("Frame", nil, AuctionHouseFrame.MUHAP, "MUHAPScrollFrameTemplate")
 		AuctionHouseFrame.MUHAP.ScrollFrame = MUHAP.ScrollFrame
 
 		-- create MUHAPFooter

@@ -5,4 +5,5 @@
     <Include file="Tabs\Tabs.xml"/>
     <Include file="Footer\Footer.xml"/>
     <Include file="CategoriesList\CategoriesList.xml"/>
+    <Include file="ScrollFrame\ScrollFrame.xml"/>
 </Ui>

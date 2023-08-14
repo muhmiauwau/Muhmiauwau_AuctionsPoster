@@ -927,3 +927,37 @@ end
 function AuctionHouseFavoriteButtonBaseMixin:IsFavorite()
 	return self.itemKey and C_AuctionHouse.IsFavoriteItem(self.itemKey);
 end
+
+
+
+
+
+
+
+
+
+
+AuctionHouseSellFrameAlignedControlMixin = {};
+
+function AuctionHouseSellFrameAlignedControlMixin:OnLoad()
+	self:SetLabel(self.labelText);
+end
+
+function AuctionHouseSellFrameAlignedControlMixin:SetLabel(text)
+	self.Label:SetText(text or "");
+	self.LabelTitle:SetText(text or "");
+end
+
+function AuctionHouseSellFrameAlignedControlMixin:SetSubtext(text)
+	self.Subtext:SetText(text);
+
+	local hasSubtext = text ~= nil;
+	self.Label:SetShown(not hasSubtext);
+	self.LabelTitle:SetShown(hasSubtext);
+	self.Subtext:SetShown(hasSubtext);
+end
+
+function AuctionHouseSellFrameAlignedControlMixin:SetLabelColor(color)
+	self.Label:SetTextColor(color:GetRGB());
+	self.LabelTitle:SetTextColor(color:GetRGB());
+end

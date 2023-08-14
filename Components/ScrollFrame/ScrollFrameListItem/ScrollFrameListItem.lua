@@ -1,10 +1,10 @@
-MUHAPScrollListItemsMixin = {}
+local ListItem = {}
 
-function MUHAPScrollListItemsMixin:OnLoad()
+function ListItem:OnLoad()
     self.holder = _G["MUHAPScrollListItemsHolder"]
 end
 
-function MUHAPScrollListItemsMixin:Empty()
+function ListItem:Empty()
     self:Hide()
     local child = self:GetChildren()
 
@@ -14,7 +14,7 @@ function MUHAPScrollListItemsMixin:Empty()
     end
 end
 
-function MUHAPScrollListItemsMixin:Fill(id)
+function ListItem:Fill(id)
     self:Show()
     local entryFrame = _G["MUHAPEntryFrame" .. id]
 
@@ -23,3 +23,7 @@ function MUHAPScrollListItemsMixin:Fill(id)
 		entryFrame:SetAllPoints(self)
     end
 end
+
+
+
+MUHAPScrollFrameListItemMixin = ListItem
