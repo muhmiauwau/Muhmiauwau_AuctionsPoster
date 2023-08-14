@@ -432,7 +432,7 @@ function MUHAPEntryMixin:OnEvent(event, itemKey)
 
 			self:InitItem()
 
-			AuctionHouseFrame.MUHAPFrame:UpdateList()
+			AuctionHouseFrame.MUHAP.ScrollFrame:UpdateList()
 
         end
 	elseif event == "AUCTION_HOUSE_AUCTION_CREATED" then 
@@ -446,8 +446,8 @@ function MUHAPEntryMixin:OnEvent(event, itemKey)
 			print("all auctions created")
 			self.PostButton:SetEnabled(false)
 
-			AuctionHouseFrame.MUHAPFrame:FilterList()
-			AuctionHouseFrame.MUHAPFrame:UpdateList()
+			AuctionHouseFrame.MUHAP.ScrollFrame:FilterList()
+			AuctionHouseFrame.MUHAP.ScrollFrame:UpdateList()
 
 			self:UnregisterEvent("AUCTION_HOUSE_AUCTION_CREATED")
 		end)
@@ -648,7 +648,7 @@ function MUHAPEntrySettingsMixin:OnShow()
 
 		self.ItemDisplay:SetOnItemChangedCallback(function(itemLocation)
 	
-			if C_AuctionHouse.IsSellItemValid(itemLocation) == false or  AuctionHouseFrame.MUHAPFrame:checkIfExits(self.ItemDisplay:GetItemID()) then 
+			if C_AuctionHouse.IsSellItemValid(itemLocation) == false or  AuctionHouseFrame.MUHAP.ScrollFrame:checkIfExits(self.ItemDisplay:GetItemID()) then 
 				C_Item.UnlockItem(itemLocation);
 				self.ItemDisplay:Reset()
 			end
@@ -661,11 +661,11 @@ end
 function MUHAPEntrySettingsMixin:createNewItem()
 	local newId = self.ItemDisplay:GetItemID()
 	if newId then 
-		if not AuctionHouseFrame.MUHAPFrame:checkIfExits(newId) then 
+		if not AuctionHouseFrame.MUHAP.ScrollFrame:checkIfExits(newId) then 
 			--print("createNewItem")
 			self.entry.id = newId
 			self:Hide()
-			AuctionHouseFrame.MUHAPFrame:AddItem(self.entry)
+			AuctionHouseFrame.MUHAP.ScrollFrame:AddItem(self.entry)
 		end
 	end
 end
@@ -675,8 +675,8 @@ function MUHAPEntrySettingsMixin:delete()
 
 	local id = self.entry.id
 	if id then 
-		if AuctionHouseFrame.MUHAPFrame:checkIfExits(id) then 
-			AuctionHouseFrame.MUHAPFrame:DeleteItem(id)
+		if AuctionHouseFrame.MUHAP.ScrollFrame:checkIfExits(id) then 
+			AuctionHouseFrame.MUHAP.ScrollFrame:DeleteItem(id)
 		end
 	end
 end
@@ -830,14 +830,14 @@ end
 
 MUHAPFooterCheckButtonMixin = {};
 function MUHAPFooterCheckButtonMixin:OnClick()
-	AuctionHouseFrame.MUHAPFrame:triggerAllChecks()
+	AuctionHouseFrame.MUHAP.ScrollFrame:triggerAllChecks()
 end
 
 
 
 MUHAPFooterPostButtonMixin = {};
 function MUHAPFooterPostButtonMixin:OnClick()
-	AuctionHouseFrame.MUHAPFrame:triggerAllPostAuctions()
+	AuctionHouseFrame.MUHAP.ScrollFrame:triggerAllPostAuctions()
 end
 
 

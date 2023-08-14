@@ -1,0 +1,52 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\FrameXML\UI.xsd">
+
+	<Script file="CreateNew.lua"/>
+
+
+
+    <Frame name="MUHAPCreateNewTemplate" mixin="MUHAPCreateNewMixin" virtual="true">
+		<Size x="500" y="45"/>
+		<Frames>
+
+			<Button parentKey="ItemDisplay" inherits="AuctionHouseInteractableItemDisplayTemplate" frameLevel="300" scale="0.5" mixin="MUHAPCreateNewItemDisplayMixin" >
+				<Size x="300" y="35"/>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture atlas="auctionhouse-itemheaderframe" useAtlasSize="false">
+							<Anchors>
+								<Anchor point="TOPLEFT" x="-20" y="20"/>
+								<Anchor point="BOTTOMRIGHT" x="200" y="-20"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Anchors>
+					<Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-200" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad method="OnLoad"/>
+				</Scripts>
+			</Button>
+
+			<Button parentKey="CreateButton" mixin="MUHAPCreateNewButtonMixin" inherits="UIPanelButtonTemplate" frameLevel="320" text="Create">
+				<Size x="94" y="22"/>
+				<Anchors>
+					<Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-10" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnClick method="OnClick"/>
+				</Scripts>
+			</Button>
+	
+		</Frames>
+		<Anchors>
+			<Anchor point="BOTTOMRIGHT" relativeKey="$parent.ScrollFrame" relativePoint="TOPRIGHT" x="0" y="0"/>
+		</Anchors>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+		</Scripts>
+	</Frame>
+
+
+</Ui>

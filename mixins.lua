@@ -345,14 +345,14 @@ function MUHAPScrollFrameMixin:UpdateList()
 	self.statusAuctions = tableFindAll(self.filterdItems, true, "status", "auction")
 	self.statusCheck = tableFindAll(self.filterdItems, true, "status", "check")
 
-	self:GetParent().MUHAPFooter.TextAuctions:SetValue(#self.statusAuctions)
-	self:GetParent().MUHAPFooter.TextCheck:SetValue(#self.statusCheck)
+	self:GetParent().Footer.TextAuctions:SetValue(#self.statusAuctions)
+	self:GetParent().Footer.TextCheck:SetValue(#self.statusCheck)
 
 	if #self.statusCheck == 0 and #self.statusAuctions > 0 then
-		self:GetParent().MUHAPFooter.PostButton:SetEnabled(true);
-		self:GetParent().MUHAPFooter.PostButton:Show()
+		self:GetParent().Footer.PostButton:SetEnabled(true);
+		self:GetParent().Footer.PostButton:Show()
 	else
-		self:GetParent().MUHAPFooter.PostButton:Hide()
+		self:GetParent().Footer.PostButton:Hide()
 	end
 
 
@@ -360,37 +360,18 @@ function MUHAPScrollFrameMixin:UpdateList()
 	self:SortList()
 
 	for i, entry in ipairs(self.filterdItems) do 
-		local frame = _G["MUHAPEntryFrame" .. entry.id]
 		local parent = _G["MUHAPScrollListItems" .. i]
-		frame:SetParent(parent)
-		frame:SetAllPoints(parent)
-		parent:Show()
+		parent:Fill(entry.id)
 	end
 
 end
 
 
 function MUHAPScrollFrameMixin:ResetList()
-
 	local children = { self.list:GetChildren() }
-	local parent = _G["MUHAPScrollListItemsHolder"]
-	for i , Frame in pairs(children) do 
-		local child = Frame:GetChildren()
-		Frame:Hide()
-
-		if child then 
-			child:SetParent(parent)
-			child:SetAllPoints(parent)
-
-		end
+	for _, child in pairs(children) do 
+		child:Empty()
 	end
-
-	local frame = _G["MUHAPEntryFramenil"]
-	local parent = _G["MUHAPScrollListItems0"]
-	frame:SetParent(parent)
-	frame:SetAllPoints(parent)
-	parent:Show()
-	
 end
 
 
@@ -400,7 +381,7 @@ function MUHAPScrollFrameMixin:generateListFrames()
 	local amount = #self.items + 20
     local height = 100
 
-	local holder = CreateFrame("Frame", "MUHAPScrollListItemsHolder", self.list)
+	local holder = CreateFrame("Frame", "MUHAPScrollListItemsHolder", AuctionHouseFrame)
 	holder:SetPoint("TOPLEFT", 0, 0)
 	holder:SetPoint("TOPRIGHT", 0, 0)
 	holder:SetHeight(100)
@@ -408,13 +389,12 @@ function MUHAPScrollFrameMixin:generateListFrames()
 
 	
 
-	for i = 0, amount, 1 do 
-		local pos = i* height * -1
-		local Frame = CreateFrame("Frame", "MUHAPScrollListItems" .. i, self.list)
+	for i = 1, amount, 1 do 
+		local pos = (i - 1)* height * -1
+		local Frame = CreateFrame("Frame", "MUHAPScrollListItems" .. i, self.list, "MUHAPScrollListItemsTemplate")
 		Frame:SetPoint("TOPLEFT", 0, pos)
 		Frame:SetPoint("TOPRIGHT", 0, pos)
 		Frame:SetHeight(height)
-		Frame:Hide()
 	end
 
 
@@ -438,12 +418,11 @@ end
 
 
 function MUHAPScrollFrameMixin:addEntry(entry)
+	if not entry.id then return end
+
 	local height = 100
-	local frameName = "MUHAPEntryFramenil"
-	if entry.id then
-		frameName = "MUHAPEntryFrame" .. entry.id
-	end
-	--print(" entry.id", entry.id, frameName)
+	local frameName = "MUHAPEntryFrame" .. entry.id
+
 	local Item = CreateFrame("Frame", frameName, MUHAPScrollListItemsHolder, "MUHAPEntryTemplate")
     Item:SetPoint("TOPLEFT", 0, 0)
     Item:SetPoint("TOPRIGHT", 0, 0)
@@ -486,7 +465,7 @@ function MUHAPScrollFrameMixin:triggerAllChecks()
 		local frame = _G["MUHAPEntryFrame" .. entry.id]
 		frame:PostItem()
 
-		self:GetParent().MUHAPFooter.PostButton:SetEnabled(false);
+		self:GetParent().Footer.PostButton:SetEnabled(false);
 		entry.status.auction = false
 	end
 
@@ -508,7 +487,7 @@ function AuctionHouseMUHAPCategoriesListMixin:SetSelectedCategory(selectedCatego
     self.selectedCategoryIndex = selectedCategoryIndex;
 	self.selectedSubCategoryIndex = selectedSubCategoryIndex;
 	self.selectedSubSubCategoryIndex = selectedSubSubCategoryIndex;
-    AuctionHouseFrame.MUHAPFrame:OnCategorySelected(selectedCategoryIndex, selectedSubCategoryIndex, selectedSubSubCategoryIndex)
+    AuctionHouseFrame.MUHAP.ScrollFrame:OnCategorySelected(selectedCategoryIndex, selectedSubCategoryIndex, selectedSubSubCategoryIndex)
 	AuctionFrameFilters_Update(self);
 end
 
@@ -530,7 +509,7 @@ function MUHAPTabsMixin:SetTab(tabID)
 	end
 	PanelTemplates_SetTab(self, tabID);
 
-	local ScrollFrame = self:GetParent().MUHAPFrame
+	local ScrollFrame = self:GetParent().ScrollFrame
 
 	ScrollFrame.showDisabled = (tabID == 2) and true or false
 

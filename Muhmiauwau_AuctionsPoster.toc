@@ -23,3 +23,6 @@ Blizzard_AuctionHouseSharedTemplates.xml
 frames.xml
 
 index.lua
+
+
+views\CreateNew\CreateNew.xml

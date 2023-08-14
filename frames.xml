@@ -3,6 +3,17 @@
 
     <Script file="mixins.lua"/>
     <Script file="MUHAPEntryMixin.lua"/>
+	<Script file="mixins/MUHAPScrollListItemsMixin.lua"/>
+	
+
+
+	<Frame name="MUHAPScrollListItemsTemplate" mixin="MUHAPScrollListItemsMixin" hidden="true"  virtual="true">
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+		</Scripts>
+	</Frame>
+
+
 
 
 	<Frame name="MUHAPFrameTemplate" mixin="MUHAPScrollFrameMixin" inherits="AuctionHouseBackgroundTemplate"  virtual="true">
@@ -33,7 +44,8 @@
 			</Layer>
 		</Layers>
 		<Anchors>
-			<Anchor point="TOPLEFT" relativeKey="$parent.CategoriesList" relativePoint="TOPRIGHT" x="0" y="0"/>
+
+		<Anchor point="TOPLEFT" relativeKey="$parent.CategoriesList" relativePoint="TOPRIGHT" x="0" y="0"/>
 			<Anchor point="BOTTOMLEFT" relativeKey="$parent.CategoriesList" relativePoint="BOTTOMRIGHT" x="8" y="0"/>
 			<Anchor point="RIGHT" x="-27" y="0"/>
 		</Anchors>
@@ -44,6 +56,10 @@
             <OnHide method="OnShow"/>
 		</Scripts>
 	</Frame>
+
+
+
+
 
 
 
@@ -91,11 +107,13 @@
 			</Button>
 		</Frames>
 		<Anchors>
-			<Anchor point="TOPRIGHT" relativeKey="$parent.MUHAPFrame" relativePoint="BOTTOMRIGHT" x="25" y="0"/>
-			<Anchor point="BOTTOMLEFT" relativeKey="$parent.MUHAPFrame" relativePoint="BOTTOMLEFT" x="0" y="-24"/>
+			<Anchor point="TOPRIGHT" relativeKey="$parent.ScrollFrame" relativePoint="BOTTOMRIGHT" x="25" y="0"/>
+			<Anchor point="BOTTOMLEFT" relativeKey="$parent.ScrollFrame" relativePoint="BOTTOMLEFT" x="0" y="-24"/>
 		</Anchors>
 		
 	</Frame>
+
+
 
 
 	<Frame name="MUHAPTabsTemplate" mixin="MUHAPTabsMixin"  virtual="true">
@@ -112,8 +130,8 @@
 			</Button>
 		</Frames>
 		<Anchors>
-			<Anchor point="TOPRIGHT" relativeKey="$parent.MUHAPFrame" relativePoint="TOPRIGHT" x="0" y="50"/>
-			<Anchor point="BOTTOMLEFT" relativeKey="$parent.MUHAPFrame" relativePoint="TOPLEFT" x="0" y="0"/>
+			<Anchor point="TOPRIGHT" relativeKey="$parent.ScrollFrame" relativePoint="TOPRIGHT" x="0" y="50"/>
+			<Anchor point="BOTTOMLEFT" relativeKey="$parent.ScrollFrame" relativePoint="TOPLEFT" x="0" y="0"/>
 		</Anchors>
 		<Scripts>
 			<OnLoad method="OnLoad"/>
@@ -121,19 +139,7 @@
 	</Frame>
 
 
-    <Frame name="MUHAPFrameTemplate2" mixin="MUHAPScrollFrameMixin"  virtual="true">
-        <Anchors>
-            <Anchor point="TOPLEFT" relativeKey="$parent.CategoriesList" relativePoint="TOPRIGHT" x="0" y="0"/>
-            <Anchor point="BOTTOMLEFT" relativeKey="$parent.CategoriesList" relativePoint="BOTTOMRIGHT" x="8" y="0"/>
-            <Anchor point="RIGHT" x="-23" y="0"/>
-        </Anchors>
-        <Scripts>
-			<OnLoad method="OnLoad"/>
-			<OnEvent method="OnEvent"/>
-			<OnHide method="OnHide"/>
-            <OnHide method="OnShow"/>
-		</Scripts>
-    </Frame>
+
 
 	<Frame name="AuctionHouseSellFrameAlignedControlTemplate" mixin="AuctionHouseSellFrameAlignedControlMixin" virtual="true">
 		<Size x="200" y="30"/>
@@ -713,9 +719,13 @@
 				</Texture>
 			</Layer>
 		</Layers>
-			<Scripts>
-				<OnLoad method="OnLoad"/>
-				<OnShow method="OnShow"/>
-			</Scripts>
+		<Anchors>
+			<Anchor point="LEFT" x="4" y="0"/>
+			<Anchor point="TOP" x="0" y="-73"/>
+		</Anchors>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+			<OnShow method="OnShow"/>
+		</Scripts>
 	</Frame>
 </Ui>

@@ -127,27 +127,33 @@ function MUHAP:OnInitialize()
 
 		MUHAP:UnregisterEvent("ADDON_LOADED")
 
-		-- create schrollframe
-		AuctionHouseFrame.MUHAPFrame = CreateFrame("Frame", nil, AuctionHouseFrame, "MUHAPFrameTemplate")
-
-		-- create schrollframe
-		AuctionHouseFrame.MUHAPFooter = CreateFrame("Frame", nil, AuctionHouseFrame, "MUHAPFooterTemplate")
-
-		-- create schrollframe
-		AuctionHouseFrame.MUHAPTabs = CreateFrame("Frame", nil, AuctionHouseFrame, "MUHAPTabsTemplate")
+		-- create Parent
+		AuctionHouseFrame.MUHAP = CreateFrame("Frame", nil, AuctionHouseFrame)
+		AuctionHouseFrame.MUHAP:SetPoint("TOPLEFT", 0, 0)
+		AuctionHouseFrame.MUHAP:SetPoint("BOTTOMRIGHT", 0, 0)
 
 		-- create CategoriesList 
-		AuctionHouseFrame.MUHAPCategoriesList = CreateFrame("Frame", nil, AuctionHouseFrame, "AuctionHouseMUHAPCategoriesListTemplate")
-		AuctionHouseFrame.MUHAPCategoriesList:SetPoint("LEFT",4, 0)
-		AuctionHouseFrame.MUHAPCategoriesList:SetPoint("TOP",0, -73)
+		AuctionHouseFrame.MUHAP.CategoriesList = CreateFrame("Frame", nil, AuctionHouseFrame.MUHAP, "AuctionHouseMUHAPCategoriesListTemplate")
+
+		-- create MUHAPFrame
+		AuctionHouseFrame.MUHAP.ScrollFrame = CreateFrame("Frame", nil, AuctionHouseFrame.MUHAP, "MUHAPFrameTemplate")
+
+		-- create MUHAPFooter
+		AuctionHouseFrame.MUHAP.Footer = CreateFrame("Frame", nil, AuctionHouseFrame.MUHAP, "MUHAPFooterTemplate")
+
+		-- create MUHAPTabs
+		AuctionHouseFrame.MUHAP.Tabs = CreateFrame("Frame", nil, AuctionHouseFrame.MUHAP, "MUHAPTabsTemplate")
+
+		-- create MUHAPCreateNew
+		AuctionHouseFrame.MUHAP.CreateNew = CreateFrame("Frame", nil, AuctionHouseFrame.MUHAP, "MUHAPCreateNewTemplate")
+
+
+		
 
 
 		-- Display config
 		AuctionHouseFrameDisplayMode["MUHAP"] = {
-			"MUHAPTabs",
-			"MUHAPCategoriesList",
-			"MUHAPFrame",
-			"MUHAPFooter"
+			"MUHAP"
 		}
 
 		-- Add Tab 
