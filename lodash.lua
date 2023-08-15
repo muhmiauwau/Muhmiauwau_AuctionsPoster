@@ -2369,7 +2369,6 @@ _.unionFind = unionfind
 
 
 
-print("Lodash", Lodash)
 function Lodash:init()
     return _
 end

@@ -13,12 +13,8 @@ function Tabs:SetTab(tabID, force)
 	end
 	
 	PanelTemplates_SetTab(self, tabID);
-
-	local ScrollFrame = self:GetParent().ScrollFrame
-
-	ScrollFrame.showDisabled = (tabID == 2) and true or false
-	ScrollFrame:FilterList()
-	ScrollFrame:UpdateList()
+	MUHAP.state.showDisabled = (tabID == 2) and true or false
+	MUHAP.List:reload()
 end
 
 function Tabs:OnLoad()

@@ -94,6 +94,8 @@
         "AuctionHouseSearchContext",
         "PanelTemplates_GetSelectedTab",
         "CreateTableBuilder",
-        "AuctionHouseTableBuilderMixin"
+        "AuctionHouseTableBuilderMixin",
+        "FramePoolMixin",
+        "CreateFramePool"
     ]
 }

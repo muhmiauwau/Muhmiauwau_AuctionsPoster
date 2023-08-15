@@ -221,8 +221,7 @@ function Entry:OnEvent(event, itemKey)
 			print("all auctions created")
 			self.PostButton:SetEnabled(false)
 
-			AuctionHouseFrame.MUHAP.ScrollFrame:FilterList()
-			AuctionHouseFrame.MUHAP.ScrollFrame:UpdateList()
+			MUHAP.List:reload()
 
 			self:UnregisterEvent("AUCTION_HOUSE_AUCTION_CREATED")
 		end)

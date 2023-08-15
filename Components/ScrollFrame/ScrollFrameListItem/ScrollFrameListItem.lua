@@ -9,16 +9,16 @@ function ListItem:Empty()
     local child = self:GetChildren()
 
     if child then 
-        child:SetParent(self.holder)
-        child:SetAllPoints(self.holder)
+        MUHAP.Entry:delete(child.entry.id)
     end
 end
 
 function ListItem:Fill(id)
     self:Show()
-    local entryFrame = _G["MUHAPEntryFrame" .. id]
+    local entryFrame = MUHAP.Entry:add(id)
 
     if entryFrame then 
+        entryFrame:Show()
         entryFrame:SetParent(self)
 		entryFrame:SetAllPoints(self)
     end

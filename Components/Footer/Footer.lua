@@ -32,17 +32,14 @@ MUHAPFooterMixin = Footer
 
 
 
-
-
-
 MUHAPFooterCheckButtonMixin = {};
 function MUHAPFooterCheckButtonMixin:OnClick()
-	AuctionHouseFrame.MUHAP.ScrollFrame:triggerAllChecks()
+	MUHAP:triggerAllChecks()
 end
 
 
 
 MUHAPFooterPostButtonMixin = {};
 function MUHAPFooterPostButtonMixin:OnClick()
-	AuctionHouseFrame.MUHAP.ScrollFrame:triggerAllPostAuctions()
+	MUHAP:triggerAllPostAuctions()
 end

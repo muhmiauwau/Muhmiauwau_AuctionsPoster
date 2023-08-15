@@ -36,6 +36,10 @@ AUCTION_DURATIONS = {
 MUHAP_CREATE_BUTTON = "Create"
 
 
+MUHAP.state =  {
+	showDisabled = false
+}
+
 
 function MUHAP:OnInitialize()
 	-- AHCC:initOptions()
@@ -157,6 +161,19 @@ function MUHAP:OnInitialize()
 		AuctionHouseFrame.MUHAP.CreateNew = MUHAP.CreateNew
 
 
+		local settings = CreateFrame("Frame", "MUHAPEntrySettings",  AuctionHouseFrame.MUHAP, "MUHAPEntrySettingsTemplate")
+		settings:Hide()
+
+
+		--FramePoolMixin use  this
+		local holder = CreateFrame("Frame", "MUHAPScrollListItemsHolder", AuctionHouseFrame.MUHAP)
+		holder:SetPoint("TOPLEFT", 0, 0)
+		holder:SetPoint("TOPRIGHT", 0, 0)
+		holder:SetHeight(100)
+		holder:Hide()
+
+		
+
 		
 		-- Display config
 		AuctionHouseFrameDisplayMode["MUHAP"] = {
@@ -180,8 +197,7 @@ end
 
 
 function MUHAP:OnCategorySelected(selectedCategoryIndex, selectedSubCategoryIndex, selectedSubSubCategoryIndex)
-	MUHAP.ScrollFrame:FilterList()
-    MUHAP.ScrollFrame:UpdateList()
+	MUHAP.List:reload()
 end
 
 
@@ -193,24 +209,23 @@ end
 
 
 function MUHAP:triggerAllChecks()
-	for i, entry in ipairs(MUHAP.ScrollFrame.filterdItems) do 
-		local frame = _G["MUHAPEntryFrame" .. entry.id]
-		frame:runCheck()
-	end
+
+	_.map(MUHAP.Entry:getAll(), function(frame)
+		frame:runCheck() 
+	end)
+
 
 	C_Timer.After(3, function() 
-		MUHAP.ScrollFrame:FilterList()
-		MUHAP.ScrollFrame:UpdateList()
+		MUHAP.List:reload()
 	end)
 
  end
 
  function MUHAP:triggerAllPostAuctions()
+	local item = _.first(MUHAP.List:get())
+	if item then 
 
-	if #MUHAP.ScrollFrame.filterdItems > 0 then 
-		local entry = MUHAP.ScrollFrame.filterdItems[1]
-
-		local frame = _G["MUHAPEntryFrame" .. entry.id]
+		local frame = MUHAP.Entry:get(entry.id)
 		frame:PostItem()
 
 		self:GetParent().Footer.PostButton:SetEnabled(false);
@@ -218,28 +233,3 @@ function MUHAP:triggerAllChecks()
 	end
  end
 
-
-
-
-
-
- function tableFindAll(table, value, key, key2)
-	local ntable = {}
-
-	for k, entry in ipairs(table) do 
-		local item = nil
-		if entry[key] then 
-			if key2 and entry[key][key2] then 
-				item = entry[key][key2]
-			else 
-				item = entry[key]
-			end
-		end
-
-		if item and item == value then 
-			ntable[#ntable + 1] = value
-		end
-	end
-
-	return ntable
-end

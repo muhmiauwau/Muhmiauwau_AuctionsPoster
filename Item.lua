@@ -41,12 +41,13 @@ function MUHAP.Item:add(entry)
         end
 
         entry.Category = classID
-        entry.SubCategory = subclassID
+        entry.SubCategory = (subclassID == 0) and 1 or subclassID
         entry.SubSubCategory = nil
+
+        print( classID, subclassID)
     end
 
     MUHAP.items[#MUHAP.items + 1] = entry
-    MUHAP.Entry:add(entry)
     MUHAP.Tabs:SetTab(2, true)
 
 end
@@ -61,8 +62,7 @@ function MUHAP.Item:delete(id)
         return value.id == id
     end)
 
-	MUHAP.ScrollFrame:FilterList()
-    MUHAP.ScrollFrame:UpdateList()
+	MUHAP.List:reload()
 end
 
 
