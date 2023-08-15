@@ -41,6 +41,12 @@ MUHAP.state =  {
 }
 
 
+MUHAP.state =  {
+	showDisabled = false,
+	List = {}
+}
+
+
 function MUHAP:OnInitialize()
 	-- AHCC:initOptions()
 
@@ -222,14 +228,17 @@ function MUHAP:triggerAllChecks()
  end
 
  function MUHAP:triggerAllPostAuctions()
-	local item = _.first(MUHAP.List:get())
-	if item then 
-
-		local frame = MUHAP.Entry:get(entry.id)
+	print("triggerAllPostAuctions")
+	print(#MUHAP.List:get(), #MUHAP.state.List)
+	local items = _.filter(MUHAP.List:get(), function(v)
+		return v.status.auction == true
+	end)
+	local item = _.first(items)
+	if item then
+		local frame = MUHAP.Entry:get(item.id)
 		frame:PostItem()
 
-		self:GetParent().Footer.PostButton:SetEnabled(false);
-		entry.status.auction = false
+		MUHAP.Footer.PostButton:SetEnabled(false);
 	end
  end
 

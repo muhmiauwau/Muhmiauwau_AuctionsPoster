@@ -1,4 +1,4 @@
-local MUHAP = LibStub("AceAddon-3.0"):GetAddon("MUHAP")
+--local MUHAP = LibStub("AceAddon-3.0"):GetAddon("MUHAP")
 
 local Lodash = LibStub:GetLibrary("Lodash")
 local _ = Lodash:init()
@@ -6,22 +6,21 @@ local _ = Lodash:init()
 
 MUHAP.List = {}
 
-MUHAP.List.list = {}
-
 
 
 function MUHAP.List:reload()
     MUHAP.ScrollFrame:reload()
 end
 
-
-function MUHAP.List:reset()
-    MUHAP.List.list = {}
-end
-
 function MUHAP.List:get()
-    return MUHAP.List.list
+    return MUHAP.state.List
 end
+
+function MUHAP.List:set(list)
+    MUHAP.state.List = list
+end
+
+
 
 function MUHAP.List:update()
 
@@ -59,24 +58,41 @@ function MUHAP.List:update()
                 ( ( selectedCategory == entry.Category ) and ( selectedSubCategory == entry.SubCategory )  and ( selectedSubSubCategory == entry.SubSubCategory ))
     end
 
-    MUHAP.List.list =  _.filter(MUHAP.items, function(entry) 
-        entry = checkStatus(entry)
-        return  checkEnabled(entry) and checkCategories(entry)
+    local list = _.filter(MUHAP.items, function(item) 
+        item = checkStatus(item)
+        item = MUHAP.Item:addMissingInfo(item)
+        return  checkEnabled(item) and checkCategories(item)
     end)
 
-
-    table.sort(MUHAP.List.list, function(a,b)
+    table.sort(list, function(a,b)
 		return
 			a.needAction and not b.needAction or
-            (a.needAction == b.needAction and a.lastChecked > b.lastChecked)
+            (a.needAction == b.needAction and a.Name < b.Name)
 	end)
 
 
+    local statusCheck =  _.filter(list, function(v)
+		if not v.status then return false end
+		return v.status.check == true
+	end)
+
+	local statusAuctions =  _.filter(list, function(v)
+		if not v.status then return false end
+		return v.status.auction == true
+	end)
+
+    
+	MUHAP.Footer.TextCheck:SetValue(#statusCheck)
+    MUHAP.Footer.TextAuctions:SetValue(#statusAuctions)
+
+
+	if #statusAuctions > 0 then
+		MUHAP.Footer.PostButton:SetEnabled(true);
+	else
+        MUHAP.Footer.PostButton:SetEnabled(false);
+	end
+
+
+    self:set(list)
+
 end
-
-
-
-
-
-
-

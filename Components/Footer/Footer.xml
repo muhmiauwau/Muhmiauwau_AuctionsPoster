@@ -27,7 +27,7 @@
 
 
 
-			<Button parentKey="PostButton"  mixin="MUHAPFooterPostButtonMixin"  frameLevel="320"  inherits="UIPanelButtonTemplate" text="Post Auctions"  hidden="true">
+			<Button parentKey="PostButton"  mixin="MUHAPFooterPostButtonMixin"  frameLevel="320"  inherits="UIPanelButtonTemplate" text="Post Auctions" >
 				<Size x="158" y="22"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT" x="0" y="0"/>
@@ -36,7 +36,7 @@
 					<OnClick method="OnClick"/>
 				</Scripts>
 			</Button>
-			<Button parentKey="CheckButton"  mixin="MUHAPFooterCheckButtonMixin"  frameLevel="300"  inherits="UIPanelButtonTemplate" text="Run Check" >
+			<Button parentKey="CheckButton"  mixin="MUHAPFooterCheckButtonMixin" hidden="true"  frameLevel="300"  inherits="UIPanelButtonTemplate" text="Run Check" >
 				<Size x="158" y="22"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT" x="0" y="0"/>

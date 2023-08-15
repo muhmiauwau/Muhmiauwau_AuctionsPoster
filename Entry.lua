@@ -18,9 +18,11 @@ function MUHAP.Entry:get(id)
     return find
 end
 
+
 function MUHAP.Entry:getAll()
     return self.activeFrames
 end
+
 
 function MUHAP.Entry:delete(id)
     if not id then return end
@@ -42,6 +44,7 @@ function MUHAP.Entry:deleteAll()
     self.activeFrames = {}
 end
 
+
 function MUHAP.Entry:add(id)
 	if not id then return end
 
@@ -56,11 +59,3 @@ function MUHAP.Entry:add(id)
     self.activeFrames[#self.activeFrames + 1] = Item
     return Item
 end
-
-
-
-
-
-
-
-
