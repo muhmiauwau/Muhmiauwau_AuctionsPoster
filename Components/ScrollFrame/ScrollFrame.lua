@@ -22,13 +22,12 @@ function ScrollFrane:generateListFrames()
 	local amount = #MUHAP.items + 20
     local height = 100
 
-	for i = 1, amount, 1 do 
-		local pos = (i - 1)* height * -1
+	_.forEach(_.range(0, -amount * height, -height), function(pos)
 		local Frame = CreateFrame("Frame", nil, self.list, "MUHAPScrollFrameListItemTemplate")
 		Frame:SetPoint("TOPLEFT", 0, pos)
 		Frame:SetPoint("TOPRIGHT", 0, pos)
 		Frame:SetHeight(height)
-	end
+	end)
 end
 
 function ScrollFrane:reload()

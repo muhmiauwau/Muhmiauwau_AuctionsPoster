@@ -31,29 +31,9 @@ function MUHAP.Item:addMissingInfo(entry)
         itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
         expacID, setID, isCraftingReagent = GetItemInfo(entry.id)
 
-
-       
-        function getItemLocation(id)
-
-            local findinBag = function(itemID)
-                for i = 0, (NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS) do
-                    for z = 1, C_Container.GetContainerNumSlots(i) do
-                        if C_Container.GetContainerItemID(i, z) == itemID then
-                            return i, z
-                        end
-                    end
-                end
-            end
-        
-            local bagId, slotId = findinBag(id)
-            --(self.entry.id, bagId, slotId )
-            return ItemLocation:CreateFromBagAndSlot(bagId, slotId)
-        
-        end
-
-
+     
         if not entry.isCommodity then 
-            local ILocation = getItemLocation(entry.id)
+            local ILocation = self:getItemLocation(entry.id)
             if ILocation then 
                 entry.isCommodity = (C_AuctionHouse.GetItemCommodityStatus(ILocation) == 2 ) and true or false
             end
@@ -100,14 +80,21 @@ end
 
 
 function MUHAP.Item:getItemLocation(itemID)
-    for containerIndex = Enum.BagIndex.Backpack, NUM_TOTAL_EQUIPPED_BAG_SLOTS do
-        for slotIndex = 1, C_Container.GetContainerNumSlots(containerIndex) do
-            if C_Container.GetContainerItemID(containerIndex, slotIndex) == itemID then
-                return ItemLocation:CreateFromBagAndSlot(containerIndex, slotIndex)
-            end
+
+    local newItemLocation = false
+
+    local checkItem  = function(containerIndex, slotIndex)
+        if C_Container.GetContainerItemID(containerIndex, slotIndex) == itemID then
+            newItemLocation = ItemLocation:CreateFromBagAndSlot(containerIndex, slotIndex)
         end
     end
-    return false;
+
+    local findSlot = function(containerIndex)
+        _.invoke(_.range(0, NUM_TOTAL_EQUIPPED_BAG_SLOTS), checkItem, containerIndex, slotIndex)
+    end
+
+    _.invoke(_.range(0, NUM_TOTAL_EQUIPPED_BAG_SLOTS), findSlot, containerIndex)
+    return newItemLocation;
 end
 
 
