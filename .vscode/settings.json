@@ -96,6 +96,9 @@
         "CreateTableBuilder",
         "AuctionHouseTableBuilderMixin",
         "FramePoolMixin",
-        "CreateFramePool"
+        "CreateFramePool",
+        "TutorialHelper",
+        "SearchBagsForItem",
+        "OpenBag"
     ]
 }

@@ -2,37 +2,16 @@ local Entry = {}
 
 
 
-function Entry:SetItem(entry)
+function Entry:Init(entry)
+	if not entry or  not entry.id then return end
     self.entry = entry
 
-    self.Highlight:Hide()
+	self.itemKey = C_AuctionHouse.MakeItemKey(self.entry.id)
+	self.itemKeyInfo = C_AuctionHouse.GetItemKeyInfo(self.itemKey);
+	SetItemButtonTexture(self.ItemButton, self.itemKeyInfo.iconFileID);
+	self.Name:SetText(AuctionHouseUtil.GetItemDisplayTextFromItemKey(self.itemKey, self.itemKeyInfo));
 
-    self.actionBackground:Hide()
-
-
-	if self.entry.id then
-		self:SetId(self.entry.id)
-	else
-		self:ShowSettings()
-	end
-	return self
-
-end
-
-function Entry:InitItem()
-
-	self.PostButton:SetEnabled(false);
-
-
-	if self.entry.buyoutAmount then 
-		self.MoneyBuyout:Show()
-		self.MoneyBuyout:SetValue(self.entry.buyoutAmount)
-		self.PostButton:SetEnabled(self.entry.needAction and self.entry.enabled and (self.entry.buyoutAmount > self.entry.minPrice))
-	else 
-		self.MoneyBuyout:Hide()
-	end
-
-
+	self:SetBuyoutAmount(self.entry.buyoutAmount)
 	self:SetNeedAction(self.entry.needAction)
 
 
@@ -43,41 +22,35 @@ function Entry:InitItem()
 
 	self:SetDuration()
 
-	self.lastChecked:SetColor(1, 1, 1, 0.5)	
+	self.lastChecked:SetColor(1, 1, 1, 0.5)
 	self.lastChecked:SetValue(date("%d.%m.%y %H:%M:%S", self.entry.lastChecked ))
 
-
+	return self
 end
+
+
+
+function Entry:SetBuyoutAmount(buyoutAmount)
+	self.entry.buyoutAmount = buyoutAmount
+	if self.entry.buyoutAmount then 
+		self.MoneyBuyout:Show()
+		self.MoneyBuyout:SetValue(self.entry.buyoutAmount)
+	else 
+		self.MoneyBuyout:Hide()
+	end
+end
+
 
 
 function Entry:SetNeedAction(state)
 	self.entry.needAction =  state or false
-	if self.entry.needAction  then 
+	if self.entry.needAction then 
 		self.actionBackground:Show()
+		self.PostButton:SetEnabled(self.entry.needAction and self.entry.enabled and (self.entry.buyoutAmount > self.entry.minPrice))
 	else
 		self.actionBackground:Hide()
+		self.PostButton:SetEnabled(false);
 	end
-end
-
-
-function Entry:SetId(id)
-	--print("id", id)
-	self.entry.id = id
-	self.itemKey = C_AuctionHouse.MakeItemKey(self.entry.id)
-	self.itemKeyInfo = C_AuctionHouse.GetItemKeyInfo(self.itemKey);
-	SetItemButtonTexture(self.ItemButton, self.itemKeyInfo.iconFileID);
-	self.Name:SetText(AuctionHouseUtil.GetItemDisplayTextFromItemKey(self.itemKey, self.itemKeyInfo));
-
-
-
-	if not self.entry.isCommodity then 
-		local ILocation = self:getItemLocation()
-		if ILocation then 
-			self.entry.isCommodity = (C_AuctionHouse.GetItemCommodityStatus(ILocation) == 2 ) and true or false
-		end
-	end
-
-	self:InitItem()
 end
 
 function Entry:SetQuantity()
@@ -92,31 +65,15 @@ end
 
 
 function Entry:SetAvailable()
-	local findinBag = function(itemID)
-        for i = 0, (NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS) do
-            for z = 1, C_Container.GetContainerNumSlots(i) do
-                if C_Container.GetContainerItemID(i, z) == itemID then
-                    return i, z
-                end
-            end
-        end
+	local ILocation = MUHAP.Item:getItemLocation(self.entry.id)
 
-		return false
-    end
-
-
-	local bagId, slotId = findinBag(self.entry.id)
-
-	if bagId == false then
+	if not ILocation then
 		self.TextAvailable:SetValue(0)
 		self.entry.enabled = false
 	else
-		local amount = C_AuctionHouse.GetAvailablePostCount(ItemLocation:CreateFromBagAndSlot(bagId, slotId))
+		local amount = C_AuctionHouse.GetAvailablePostCount(ILocation)
 		self.TextAvailable:SetValue(amount)
 	end
-	
-   
-
 end
 
 
@@ -194,20 +151,17 @@ function Entry:OnEvent(event, itemKey)
 			
 
 			if result then 
-				self.entry.needAction = needUpdate(result)
-				self.entry.buyoutAmount = result[priceKey]
+				self:SetNeedAction(needUpdate(result))
+				self:SetBuyoutAmount(result[priceKey])
 			else
-				self.entry.needAction = false
-				self.entry.buyoutAmount = 0
+				self:SetNeedAction(false)
+				self:SetBuyoutAmount(0)
 			end
 
-			--print("ok?")
 			self.entry.lastChecked = time()
 
 
-			self:InitItem()
-
-			AuctionHouseFrame.MUHAP.ScrollFrame:UpdateList()
+			MUHAP.List:update()
 
         end
 	elseif event == "AUCTION_HOUSE_AUCTION_CREATED" then 
@@ -215,6 +169,8 @@ function Entry:OnEvent(event, itemKey)
 		if self.lastAuctionTimer then
 			self.lastAuctionTimer:Cancel()
 		end
+
+		self:SetNeedAction(false)
 		
 
 		self.lastAuctionTimer = C_Timer.NewTimer(3, function() 
@@ -259,32 +215,14 @@ function Entry:runCheck()
 
 end
 
-function Entry:getItemLocation()
-
-	local findinBag = function(itemID)
-        for i = 0, (NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS) do
-            for z = 1, C_Container.GetContainerNumSlots(i) do
-                if C_Container.GetContainerItemID(i, z) == itemID then
-                    return i, z
-                end
-            end
-        end
-    end
-
-    local bagId, slotId = findinBag(self.entry.id)
-	--(self.entry.id, bagId, slotId )
-	return ItemLocation:CreateFromBagAndSlot(bagId, slotId)
-
-end
-
 
 function Entry:PostItem()
-	local ILocation = self:getItemLocation()
+	local ILocation = MUHAP.Item:getItemLocation(self.entry.id)
 	local itemsAvaible = C_AuctionHouse.GetAvailablePostCount(ILocation)
 	local qty = (itemsAvaible < self.entry.qty) and itemsAvaible or self.entry.qty
 
 	
-	self:SetNeedAction(false)
+	
 	self:RegisterEvent("AUCTION_HOUSE_AUCTION_CREATED")
 
 	if self.entry.isCommodity then 

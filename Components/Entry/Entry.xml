@@ -179,7 +179,6 @@
 		</Frames>
         <Layers>
 			<Layer level="ARTWORK">
-
                 <FontString parentKey="Name" inherits="SystemFont_Shadow_Large" justifyH="LEFT">
 					<Size x="0" y="64"/>
 					<Anchors>
@@ -187,7 +186,7 @@
                         <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-300" y="0"/>
 					</Anchors>
 				</FontString>
-                <Texture parentKey="Highlight" atlas="GarrMissionLocation-Maw-ButtonHighlight" alpha="0.2"></Texture>
+                <Texture parentKey="Highlight" atlas="GarrMissionLocation-Maw-ButtonHighlight" hidden="true" alpha="0.2"></Texture>
                 <Texture parentKey="actionBackground" atlas="GarrMissionLocation-Maw-ButtonBG" alpha="1"></Texture>
 				<Texture parentKey="Background" atlas="GarrMissionLocation-Maw-ButtonBG" alpha="0.2"></Texture>
 			</Layer>

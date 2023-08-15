@@ -12,7 +12,7 @@
                     <KeyValue key="type" value="MUHAP_TEXT_TYPE.Auctions" type="global"/>
                 </KeyValues>
                 <Anchors>
-                    <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-170" y="-5" />
+                    <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-250" y="-5" />
                 </Anchors>
             </Frame>
 
@@ -21,13 +21,13 @@
                     <KeyValue key="type" value="MUHAP_TEXT_TYPE.Check" type="global"/>
                 </KeyValues>
                 <Anchors>
-                    <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-170" y="5" />
+                    <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="-250" y="5" />
                 </Anchors>
             </Frame>
 
 
 
-			<Button parentKey="PostButton"  mixin="MUHAPFooterPostButtonMixin"  frameLevel="320"  inherits="UIPanelButtonTemplate" text="Post Auctions" >
+			<Button parentKey="PostButton"  mixin="MUHAPFooterPostButtonMixin"  inherits="UIPanelButtonTemplate" text="Post Auctions" >
 				<Size x="158" y="22"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT" x="0" y="0"/>
@@ -36,10 +36,11 @@
 					<OnClick method="OnClick"/>
 				</Scripts>
 			</Button>
-			<Button parentKey="CheckButton"  mixin="MUHAPFooterCheckButtonMixin" hidden="true"  frameLevel="300"  inherits="UIPanelButtonTemplate" text="Run Check" >
-				<Size x="158" y="22"/>
+			
+			<Button parentKey="CheckButton"  mixin="MUHAPFooterCheckButtonMixin"  inherits="UIPanelButtonTemplate" text="Scan" >
+				<Size x="58" y="22"/>
 				<Anchors>
-					<Anchor point="TOPRIGHT" x="0" y="0"/>
+					<Anchor point="RIGHT" relativeKey="$parent.PostButton" relativePoint="LEFT" x="0" y="0"/>
 				</Anchors>
 				<Scripts>
 					<OnClick method="OnClick"/>

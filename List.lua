@@ -71,27 +71,7 @@ function MUHAP.List:update()
 	end)
 
 
-    local statusCheck =  _.filter(list, function(v)
-		if not v.status then return false end
-		return v.status.check == true
-	end)
-
-	local statusAuctions =  _.filter(list, function(v)
-		if not v.status then return false end
-		return v.status.auction == true
-	end)
-
-    
-	MUHAP.Footer.TextCheck:SetValue(#statusCheck)
-    MUHAP.Footer.TextAuctions:SetValue(#statusAuctions)
-
-
-	if #statusAuctions > 0 then
-		MUHAP.Footer.PostButton:SetEnabled(true);
-	else
-        MUHAP.Footer.PostButton:SetEnabled(false);
-	end
-
+    MUHAP.Footer:checkAuctions()
 
     self:set(list)
 

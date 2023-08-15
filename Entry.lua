@@ -55,7 +55,7 @@ function MUHAP.Entry:add(id)
     if not entry then return end
 
     local Item = self.pool:Acquire()
-	Item:SetItem(entry)
+	Item:Init(entry)
     self.activeFrames[#self.activeFrames + 1] = Item
     return Item
 end

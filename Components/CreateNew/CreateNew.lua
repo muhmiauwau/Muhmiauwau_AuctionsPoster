@@ -5,9 +5,12 @@ function CreateNew:OnLoad()
 	self.id = nil
 end
 
+
+
 function CreateNew:CreateNew()
 	if self.id then 
 		if not MUHAP.Item:exist(self.id) then 
+
 			local entry = {
 				id = self.id,
 				minPrice = 0,
@@ -17,6 +20,11 @@ function CreateNew:CreateNew()
 				needAction = false,
 				duration = 1
 			}
+
+			local ILocation = MUHAP.Item:getItemLocation(self.id)
+			if ILocation then 
+				entry.isCommodity = (C_AuctionHouse.GetItemCommodityStatus(ILocation) == 2 ) and true or false
+			end
 
 			MUHAP.Item:add(entry)
 			self:Reset()
