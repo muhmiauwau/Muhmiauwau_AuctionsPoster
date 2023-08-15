@@ -1,44 +1,20 @@
-function tableFindAll(table, value, key, key2)
-	local ntable = {}
-
-	for k, entry in ipairs(table) do 
-		local item = nil
-		if entry[key] then 
-			if key2 and entry[key][key2] then 
-				item = entry[key][key2]
-			else 
-				item = entry[key]
-			end
-		end
-
-		if item and item == value then 
-			ntable[#ntable + 1] = value
-		end
-	end
-
-	return ntable
-end
-
+local Lodash = LibStub:GetLibrary("Lodash")
+local _ = Lodash:init()
 
 
 
 local ScrollFrane = {}
 
 
-
-
-
 function ScrollFrane:OnLoad()
 
 	self.showDisabled = false
 
-	self.ticker = nil
 
 	self.selectedCategoryIndex = nil;
 	self.selectedSubCategoryIndex = nil;
 	self.selectedSubSubCategoryIndex = nil;
 
-	self.items = AuctionsPosterCharDB.items
 	self.filterdItems = {}
 
 
@@ -48,50 +24,9 @@ function ScrollFrane:OnLoad()
 
 	self:generateListFrames()
 
-	for _, entry in pairs(self.items) do 
-		self:addEntry(entry)
+	for _, entry in pairs(MUHAP.items) do 
+		MUHAP.Entry:add(entry)
 	end
-end
-
-
-
-function ScrollFrane:AddItem(entry)
-
-	local itemName, itemLink, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType,
-	itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
-	expacID, setID, isCraftingReagent = GetItemInfo(entry.id)
-
-
-	if classID == 3 then --gems
-		classID = 4
-	elseif  classID == 1 then --container
-		classID = 3 
-	end
-
-
-	entry.Category = classID
-    entry.SubCategory = subclassID
-    entry.SubSubCategory = nil
-
-	
-	self.items[#self.items + 1] = entry
-	self:addEntry(entry)
-
-	self:FilterList()
-	self:UpdateList()
-	
-
-end
-
-function ScrollFrane:DeleteItem(id)
-	for i, entry in ipairs(self.items) do 
-		if entry.id == id then 
-			tremove(self.items, i)
-		end
-	end
-
-	self:FilterList()
-    self:UpdateList()
 end
 
 
@@ -103,7 +38,7 @@ function ScrollFrane:FilterList()
 	local selectedSubCategoryIndex = MUHAP.CategoriesList.selectedSubCategoryIndex
 	local selectedSubSubCategoryIndex = MUHAP.CategoriesList.selectedSubSubCategoryIndex
 
-	for _, entry in pairs(self.items) do 
+	for _, entry in pairs(MUHAP.items) do 
 
 		local item = nil
 
@@ -119,7 +54,7 @@ function ScrollFrane:FilterList()
 			end
 		elseif selectedSubSubCategoryIndex == nil then
 			if selectedCategoryIndex == Category and selectedSubCategoryIndex == SubCategory then 
-				item= entry
+				item = entry
 			end
 		else
 			if selectedCategoryIndex == Category  and selectedSubCategoryIndex == SubCategory and selectedSubSubCategoryIndex == SubSubCategory then 
@@ -169,42 +104,18 @@ function ScrollFrane:SortList()
 
 end
 
-function ScrollFrane:OnShow()
-	if self.ticker then
-		self.ticker:Cancel()
-	end
-
-	self.ticker = C_Timer.NewTimer(60, function ()
-		self:triggerAllChecks()
-	end)
-end
-
-
-function ScrollFrane:OnEvent(event, ...)
-end
-
-function ScrollFrane:OnHide()
-
-	if self.ticker then
-		self.ticker:Cancel()
-	end
-end
-
-
-function ScrollFrane:checkIfExits(id)
-	local match = false
-	for _, entry in pairs(self.items) do 
-		if entry.id == id then 
-			match = true
-		end 
-	end 
-	return match
-end
 
 function ScrollFrane:UpdateList()
 
-	self.statusAuctions = tableFindAll(self.filterdItems, true, "status", "auction")
-	self.statusCheck = tableFindAll(self.filterdItems, true, "status", "check")
+	self.statusCheck =  _.filter(self.filterdItems, function(v)
+		if not v.status then return false end
+		return v.status.check == true
+	end)
+
+	self.statusAuctions =  _.filter(self.filterdItems, function(v)
+		if not v.status then return false end
+		return v.status.auction == true
+	end)
 
 	self:GetParent().Footer.TextAuctions:SetValue(#self.statusAuctions)
 	self:GetParent().Footer.TextCheck:SetValue(#self.statusCheck)
@@ -239,7 +150,7 @@ end
 
 function ScrollFrane:generateListFrames()
 
-	local amount = #self.items + 20
+	local amount = #MUHAP.items + 20
     local height = 100
 
 	local holder = CreateFrame("Frame", "MUHAPScrollListItemsHolder", AuctionHouseFrame)
@@ -249,7 +160,7 @@ function ScrollFrane:generateListFrames()
 	holder:Hide()
 
 	
-
+--FramePoolMixin use  this
 	for i = 1, amount, 1 do 
 		local pos = (i - 1)* height * -1
 		local Frame = CreateFrame("Frame", "MUHAPScrollListItems" .. i, self.list, "MUHAPScrollFrameListItemTemplate")
@@ -258,22 +169,11 @@ function ScrollFrane:generateListFrames()
 		Frame:SetHeight(height)
 	end
 
-
-	self:addEntry({
-		id = nil,
-		Category = nil,
-		SubCategory = nil,
-		SubSubCategory = nil,
-		minPrice = 0,
-		lastChecked = time(),
-		qty = 1,
-		enabled = true,
-		needAction = false,
-		duration = 1
-	})
-
-
-
+	local settings = CreateFrame("Frame", "MUHAPEntrySettings", MUHAPScrollListItemsHolder, "MUHAPEntrySettingsTemplate")
+    settings:SetPoint("TOPLEFT", 0, 0)
+    settings:SetPoint("TOPRIGHT", 0, 0)
+	settings:SetFrameLevel(500)
+    settings:SetHeight(height) 
 end
 
 
@@ -295,43 +195,6 @@ function ScrollFrane:addEntry(entry)
 end
 
 
-function ScrollFrane:OnEvent(event, ...)
-   -- print(event)
-end
-
-
-function ScrollFrane:triggerAllChecks()
-	--print("triggerAllChecks")
-
-
-	for i, entry in ipairs(self.filterdItems) do 
-		local frame = _G["MUHAPEntryFrame" .. entry.id]
-		frame:runCheck()
-	end
-
-	C_Timer.After(3, function() 
-		self:FilterList()
-		self:UpdateList()
-	end)
-
- end
-
- function ScrollFrane:triggerAllPostAuctions()
---	print("triggerAllPostAuctions")
-	
-	if #self.filterdItems > 0 then 
-
-		local entry = self.filterdItems[1]
-
-		local frame = _G["MUHAPEntryFrame" .. entry.id]
-		frame:PostItem()
-
-		self:GetParent().Footer.PostButton:SetEnabled(false);
-		entry.status.auction = false
-	end
-
-
- end
 
 
  MUHAPScrollFrameMixin = ScrollFrane

@@ -96,10 +96,8 @@ end
 function MUHAPEntrySettingsMixin:delete()
 
 	local id = self.entry.id
-	if id then 
-		if AuctionHouseFrame.MUHAP.ScrollFrame:checkIfExits(id) then 
-			AuctionHouseFrame.MUHAP.ScrollFrame:DeleteItem(id)
-		end
+	if id then
+		MUHAP.Item:delete(id)
 	end
 end
 
@@ -108,8 +106,16 @@ function MUHAPEntrySettingsMixin:OnHide()
 end
 
 function MUHAPEntrySettingsMixin:HideSettings()
-	self:Hide()
+	--self:Hide()
 end
+
+
+
+function MUHAPEntrySettingsMixin:CloseSettings()
+	self:GetParent():CloseSettings()
+end
+
+
 
 
 
@@ -221,6 +227,32 @@ function MUHAPEnabledMixin:SetState(state)
 
 	self.CheckButton:SetChecked(state);
 	--print("UpdateState", state)
+end
+
+
+
+
+MUHAPEntryPostButtonMixin = {};
+
+function MUHAPEntryPostButtonMixin:OnClick()
+	self:GetParent():PostItem();
+	PlaySound(SOUNDKIT.LOOT_WINDOW_COIN_SOUND);
+end
+
+
+MUHAPEntryCreateButtonMixin = {};
+
+function MUHAPEntryCreateButtonMixin:OnClick()
+	self:GetParent():createNewItem();
+	PlaySound(SOUNDKIT.LOOT_WINDOW_COIN_SOUND);
+end
+
+
+MUHAPEntryDeleteButtonMixin = {};
+
+function MUHAPEntryDeleteButtonMixin:OnClick()
+	self:GetParent():delete();
+	PlaySound(SOUNDKIT.LOOT_WINDOW_COIN_SOUND);
 end
 
 

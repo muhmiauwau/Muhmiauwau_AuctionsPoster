@@ -50,7 +50,11 @@
 			<Anchor point="TOPRIGHT" relativeKey="$parent.ScrollFrame" relativePoint="BOTTOMRIGHT" x="25" y="0"/>
 			<Anchor point="BOTTOMLEFT" relativeKey="$parent.ScrollFrame" relativePoint="BOTTOMLEFT" x="0" y="-24"/>
 		</Anchors>
-		
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+			<OnHide method="OnHide"/>
+            <OnHide method="OnShow"/>
+		</Scripts>
 	</Frame>    
 
 </Ui>

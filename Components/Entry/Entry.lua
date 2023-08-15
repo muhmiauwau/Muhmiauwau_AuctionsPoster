@@ -231,7 +231,6 @@ end
 
 
 
-
 function Entry:runCheck()
     if not self.entry.enabled or not self.entry.id then 
         return 
@@ -287,7 +286,6 @@ function Entry:PostItem()
 
 	
 	self:SetNeedAction(false)
-
 	self:RegisterEvent("AUCTION_HOUSE_AUCTION_CREATED")
 
 	if self.entry.isCommodity then 
@@ -295,53 +293,53 @@ function Entry:PostItem()
 	else 
 		C_AuctionHouse.PostItem(ILocation, self.entry.duration, qty, nil, self.entry.buyoutAmount)
 	end
-
-   
-
-
-	
 end
 
 
 
-function Entry:ShowSettings()
-	self.Settings:Show()
+function Entry:OpenSettings()
+
+	local settingsFrame = _G["MUHAPEntrySettings"]
+	if settingsFrame then 
+		settingsFrame:Hide()
+        settingsFrame:SetParent(self)
+		settingsFrame:SetAllPoints(self)
+		settingsFrame:SetFrameLevel(500)
+		settingsFrame:Show()
+    end
+end
+
+function Entry:CloseSettings()
+
+	local parent =  _G["MUHAPScrollListItemsHolder"]
+	local settingsFrame = _G["MUHAPEntrySettings"]
+	if settingsFrame then 
+        settingsFrame:SetParent(parent)
+		settingsFrame:SetAllPoints(parent)
+		settingsFrame:Hide()
+    end
 end
 
 
-function Entry:HideSettings()
-	self.Settings:Hide()
+local EntryClick = {}
+
+function EntryClick:clickSettings() -- bind SettingsButton button
+	self:GetParent():OpenSettings()
 end
 
+function EntryClick:clickReload() -- bind ReloadButton button
+	self:GetParent():runCheck()
+end
 
-
-
-
-MUHAPEntryPostButtonMixin = {};
-
-function MUHAPEntryPostButtonMixin:OnClick()
+function EntryClick:clickPost() -- bind PostButton button
 	self:GetParent():PostItem();
-	PlaySound(SOUNDKIT.LOOT_WINDOW_COIN_SOUND);
 end
 
 
-MUHAPEntryCreateButtonMixin = {};
-
-function MUHAPEntryCreateButtonMixin:OnClick()
-	self:GetParent():createNewItem();
-	PlaySound(SOUNDKIT.LOOT_WINDOW_COIN_SOUND);
-end
-
-
-MUHAPEntryDeleteButtonMixin = {};
-
-function MUHAPEntryDeleteButtonMixin:OnClick()
-	self:GetParent():delete();
-	PlaySound(SOUNDKIT.LOOT_WINDOW_COIN_SOUND);
-end
 
 
 
 
 
 MUHAPEntryMixin = Entry
+MUHAPEntryMixinClick = EntryClick

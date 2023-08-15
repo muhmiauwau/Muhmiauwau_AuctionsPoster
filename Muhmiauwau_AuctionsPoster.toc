@@ -18,6 +18,13 @@ libs\AceLocale-3.0\AceLocale-3.0.xml
 
 
 
+lodash.lua
+
 Components/index.xml
+
 index.lua
+
+
+Item.lua
+Entry.lua
 

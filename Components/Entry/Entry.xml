@@ -7,15 +7,7 @@
         <Frames>
 
 
-            <Frame parentKey="Settings" inherits="MUHAPEntrySettingsTemplate"  frameLevel="400">
-                <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="0" y="0" />
-                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="0" y="0" />
-                </Anchors>
-            </Frame>
-
-
-            <Button parentKey="SettingsButton" mixin="MUHAPEntrySettingsButtonMixin">
+            <Button parentKey="SettingsButton" mixin="MUHAPEntryMixinClick">
                 <Size x="22" y="22"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT" x="-12" y="-12"/>
@@ -23,12 +15,12 @@
                 <NormalTexture atlas="Warfronts-BaseMapIcons-Empty-Workshop-Minimap"/>
 
                 <Scripts>
-                   <OnClick method="open"/>
+                   <OnClick method="clickSettings"/>
                 </Scripts>
 			</Button>
 
 
-			<Button parentKey="ReloadButton" mixin="MUHAPEntrySettingsButtonMixin">
+			<Button parentKey="ReloadButton" mixin="MUHAPEntryMixinClick">
                 <Size x="22" y="22"/>
 				<Anchors>
 					<Anchor point="TOP" relativeKey="$parent.SettingsButton" relativePoint="BOTTOM" x="0" y="0"/>
@@ -36,38 +28,12 @@
                 <NormalTexture atlas="UI-RefreshButton"  />
 
                 <Scripts>
-                   <OnClick method="reload"/>
+                   <OnClick method="clickReload"/>
                 </Scripts>
 			</Button>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-			<Button parentKey="ItemButton" inherits="GiantItemButtonTemplate">
-				<Anchors>
-					<Anchor point="LEFT" x="12" y="0"/>
-				</Anchors>
-			</Button>
-
-
-
-            <Button parentKey="PostButton" motionScriptsWhileDisabled="true" mixin="MUHAPEntryPostButtonMixin" inherits="UIPanelButtonTemplate" text="AUCTION_HOUSE_POST_BUTTON" frameLevel="350">
+            <Button parentKey="PostButton" mixin="MUHAPEntryMixinClick" inherits="UIPanelButtonTemplate" text="AUCTION_HOUSE_POST_BUTTON">
 				<KeyValues>
 					<KeyValue key="leftPadding" value="74" type="number"/>
 				</KeyValues>
@@ -76,9 +42,37 @@
 					<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="-12" y="20"/>
 				</Anchors>
 				<Scripts>
-					<OnClick method="OnClick"/>
+					<OnClick method="clickPost"/>
 				</Scripts>
 			</Button>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			<Button parentKey="ItemButton" inherits="GiantItemButtonTemplate" frameLevel="501">
+				<Anchors>
+					<Anchor point="LEFT" x="12" y="0"/>
+				</Anchors>
+			</Button>
+
+
+
+    
 
 
     

@@ -180,20 +180,20 @@
 
 
 
-    <Frame name="MUHAPEntrySettingsTemplate"  mixin="MUHAPEntrySettingsMixin" hidden="true"  virtual="true">
+    <Frame name="MUHAPEntrySettingsTemplate" mixin="MUHAPEntrySettingsMixin" hidden="true" virtual="true">
         <Frames>
 
 
 
 
-            <Button parentKey="SettingsButton" mixin="MUHAPEntrySettingsButtonMixin">
+            <Button parentKey="SettingsButton" mixin="MUHAPEntrySettingsMixin">
                 <Size x="22" y="22"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT" x="-12" y="-12"/>
 				</Anchors>
                 <NormalTexture atlas="Warfronts-BaseMapIcons-Empty-Workshop-Minimap"/>
                 <Scripts>
-                   <OnClick method="close"/>
+                   <OnClick method="CloseSettings"/>
                 </Scripts>
 			</Button>
 

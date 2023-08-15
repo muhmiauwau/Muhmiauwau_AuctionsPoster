@@ -1,4 +1,6 @@
 MUHAP = LibStub("AceAddon-3.0"):NewAddon("MUHAP", "AceEvent-3.0")
+local Lodash = LibStub:GetLibrary("Lodash")
+local _ = Lodash:init()
 
 
 
@@ -103,6 +105,8 @@ function MUHAP:OnInitialize()
 		AuctionsPosterDB.activeChars[formattedName] = time()
 	end
 
+
+	self.items = AuctionsPosterCharDB.items
  end 
 
 
@@ -141,13 +145,16 @@ function MUHAP:OnInitialize()
 		AuctionHouseFrame.MUHAP.ScrollFrame = MUHAP.ScrollFrame
 
 		-- create MUHAPFooter
-		AuctionHouseFrame.MUHAP.Footer = CreateFrame("Frame", nil, AuctionHouseFrame.MUHAP, "MUHAPFooterTemplate")
+		MUHAP.Footer = CreateFrame("Frame", nil, AuctionHouseFrame.MUHAP, "MUHAPFooterTemplate")
+		AuctionHouseFrame.MUHAP.Footer = MUHAP.Footer
 
 		-- create MUHAPTabs
-		AuctionHouseFrame.MUHAP.Tabs = CreateFrame("Frame", nil, AuctionHouseFrame.MUHAP, "MUHAPTabsTemplate")
+		MUHAP.Tabs = CreateFrame("Frame", nil, AuctionHouseFrame.MUHAP, "MUHAPTabsTemplate")
+		AuctionHouseFrame.MUHAP.Tabs = MUHAP.Tabs 
 
 		-- create MUHAPCreateNew
-		AuctionHouseFrame.MUHAP.CreateNew = CreateFrame("Frame", nil, AuctionHouseFrame.MUHAP, "MUHAPCreateNewTemplate")
+		MUHAP.CreateNew = CreateFrame("Frame", nil, AuctionHouseFrame.MUHAP, "MUHAPCreateNewTemplate")
+		AuctionHouseFrame.MUHAP.CreateNew = MUHAP.CreateNew
 
 
 		
@@ -156,6 +163,7 @@ function MUHAP:OnInitialize()
 			"MUHAP"
 		}
 
+	
 		-- Add Tab 
 		local tabsAmount = #AuctionHouseFrame.Tabs + 1
 		local button = CreateFrame("Button", "AuctionHouseFrameTab" .. tabsAmount, AuctionHouseFrame, "AuctionHouseFrameDisplayModeTabTemplate")
@@ -174,4 +182,64 @@ end
 function MUHAP:OnCategorySelected(selectedCategoryIndex, selectedSubCategoryIndex, selectedSubSubCategoryIndex)
 	MUHAP.ScrollFrame:FilterList()
     MUHAP.ScrollFrame:UpdateList()
+end
+
+
+
+
+
+
+
+
+
+function MUHAP:triggerAllChecks()
+	for i, entry in ipairs(MUHAP.ScrollFrame.filterdItems) do 
+		local frame = _G["MUHAPEntryFrame" .. entry.id]
+		frame:runCheck()
+	end
+
+	C_Timer.After(3, function() 
+		MUHAP.ScrollFrame:FilterList()
+		MUHAP.ScrollFrame:UpdateList()
+	end)
+
+ end
+
+ function MUHAP:triggerAllPostAuctions()
+
+	if #MUHAP.ScrollFrame.filterdItems > 0 then 
+		local entry = MUHAP.ScrollFrame.filterdItems[1]
+
+		local frame = _G["MUHAPEntryFrame" .. entry.id]
+		frame:PostItem()
+
+		self:GetParent().Footer.PostButton:SetEnabled(false);
+		entry.status.auction = false
+	end
+ end
+
+
+
+
+
+
+ function tableFindAll(table, value, key, key2)
+	local ntable = {}
+
+	for k, entry in ipairs(table) do 
+		local item = nil
+		if entry[key] then 
+			if key2 and entry[key][key2] then 
+				item = entry[key][key2]
+			else 
+				item = entry[key]
+			end
+		end
+
+		if item and item == value then 
+			ntable[#ntable + 1] = value
+		end
+	end
+
+	return ntable
 end

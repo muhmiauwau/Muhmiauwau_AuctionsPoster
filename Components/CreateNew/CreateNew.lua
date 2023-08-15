@@ -7,7 +7,7 @@ end
 
 function CreateNew:CreateNew()
 	if self.id then 
-		if not AuctionHouseFrame.MUHAP.ScrollFrame:checkIfExits(self.id) then 
+		if not MUHAP.Item:exist(self.id) then 
 			local entry = {
 				id = self.id,
 				minPrice = 0,
@@ -18,8 +18,7 @@ function CreateNew:CreateNew()
 				duration = 1
 			}
 
-			AuctionHouseFrame.MUHAP.ScrollFrame:AddItem(entry)
-			AuctionHouseFrame.MUHAP.Tabs:SetTab(2)
+			MUHAP.Item:add(entry)
 			self:Reset()
 		end
 	end
@@ -54,7 +53,7 @@ function ItemDisplay:OnLoad()
 	self:SetOnItemChangedCallback(function(itemLocation)
 		self:GetParent():SetItemLocation(itemLocation)
 		local id = self:GetItemID()
-		if C_AuctionHouse.IsSellItemValid(itemLocation) == false or AuctionHouseFrame.MUHAP.ScrollFrame:checkIfExits(id) then 
+		if C_AuctionHouse.IsSellItemValid(itemLocation) == false or MUHAP.Item:exist(id) then 
 			self:Reset()
 			C_Item.UnlockItem(itemLocation);
 		else

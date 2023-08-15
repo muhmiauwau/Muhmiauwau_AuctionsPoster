@@ -34,9 +34,6 @@
 		</Anchors>
 		<Scripts>
 			<OnLoad method="OnLoad"/>
-			<OnEvent method="OnEvent"/>
-			<OnHide method="OnHide"/>
-            <OnHide method="OnShow"/>
 		</Scripts>
 	</Frame>
  
