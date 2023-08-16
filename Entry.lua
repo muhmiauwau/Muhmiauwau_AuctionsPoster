@@ -19,7 +19,6 @@ function MUHAP.Entry:get(itemKey)
     return find
 end
 
-
 function MUHAP.Entry:getAll()
     return self.activeFrames
 end
@@ -52,11 +51,14 @@ function MUHAP.Entry:add(itemKey)
     local exist = self:get(itemKey)
     if exist then return exist end
 
-   local entry = MUHAP.Item:get(itemKey.itemID, itemKey.itemLevel)
-   if not entry then return end
+   local item = MUHAP.Item:get(itemKey)
+   if not item then return end
 
-    local Item = self.pool:Acquire()
-	Item:Init(entry)
-    self.activeFrames[#self.activeFrames + 1] = Item
-    return Item
+    local Frame = self.pool:Acquire()
+	Frame:Init(item)
+    self.activeFrames[#self.activeFrames + 1] = Frame
+    return Frame
 end
+
+
+

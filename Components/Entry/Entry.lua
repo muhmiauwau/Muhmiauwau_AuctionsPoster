@@ -21,6 +21,8 @@ function Entry:Init(entry)
 	self:SetQuantity()
 	self:SetAvailable()
 
+	self:SetEnabled(self.entry.enabled)
+
 
 	self:SetDuration()
 
@@ -73,7 +75,7 @@ function Entry:SetAvailable()
 
 	if not ILocation then
 		self.TextAvailable:SetValue(0)
-		self.entry.enabled = false
+		self:SetEnabled(false)
 	else
 		local amount = C_AuctionHouse.GetAvailablePostCount(ILocation)
 		self.TextAvailable:SetValue(amount)
@@ -86,8 +88,14 @@ function Entry:SetDuration()
 end
 
 
-function Entry:UpdateEnabled()
-	
+function Entry:SetEnabled(state)
+	self.entry.enabled = state
+
+	if state then
+		self.ReloadButton:Show()
+	else 
+		self.ReloadButton:Hide()
+	end
 end
 
 
@@ -105,126 +113,11 @@ function Entry:OnLoad()
 end
 
 
-function Entry:OnEvent(event, itemKey)
-
-	if event == "ITEM_SEARCH_RESULTS_UPDATED" or event == "COMMODITY_SEARCH_RESULTS_UPDATED" then
-		
-		if 
-		(
-			event == "ITEM_SEARCH_RESULTS_UPDATED"
-			and
-			self.entry.itemKey.itemID == itemKey.itemID
-			and 
-			self.entry.itemKey.itemLevel == itemKey.itemLevel
-		)
-		or
-		(
-			event == "COMMODITY_SEARCH_RESULTS_UPDATED"
-			and
-			self.entry.itemKey.itemID == itemKey
-		)
-		then 
-			self:UnregisterEvent(event)
-
-			
-
-			local priceKey = "buyoutAmount"
-			if self.entry.isCommodity then 
-				priceKey = "unitPrice"
-			end
-
-
-            local needUpdate = function(result)
-				local match = true
-				
-				if #result.owners > 0 then 
-					local _, realm =  UnitName("player")
-					local formattedName = MUHAP:formatPlayerName(result.owners[1], realm )
-					if result.owners[1] == "player" or AuctionsPosterDB.activeChars[formattedName] or AuctionsPosterDB.activeChars[result.owners[1]] then 
-						match = false
-					end
-				else
-					match = false
-				end
-
-				if self.entry.minPrice > result[priceKey] then 
-					match = false
-				end
-
-                return match
-            end
-
-			local result = nil
-			
-			if self.entry.isCommodity then 
-				result = C_AuctionHouse.GetCommoditySearchResultInfo(self.entry.itemKey.itemID, 1)
-			else 
-				result = C_AuctionHouse.GetItemSearchResultInfo(self.entry.itemKey, 1)
-			end
-
-
-			if result then 
-				self:SetNeedAction(needUpdate(result))
-				self:SetBuyoutAmount(result[priceKey])
-			else
-				self:SetNeedAction(false)
-				self:SetBuyoutAmount(0)
-			end
-
-
-			self.entry.lastChecked = time()
-
-			print("check end", self.entry.itemKey.itemID)
-			--MUHAP.List:update()
-
-        end
-	elseif event == "AUCTION_HOUSE_AUCTION_CREATED" then 
-		
-		if self.lastAuctionTimer then
-			self.lastAuctionTimer:Cancel()
-		end
-
-		self:SetNeedAction(false)
-		
-
-		self.lastAuctionTimer = C_Timer.NewTimer(3, function() 
-			print("all auctions created")
-			self.PostButton:SetEnabled(false)
-
-			MUHAP.List:reload()
-
-			self:UnregisterEvent("AUCTION_HOUSE_AUCTION_CREATED")
-		end)
-	end
-end
-
-
-
 function Entry:runCheck()
-    if not self.entry.enabled or not self.entry.id then 
-        return 
-    end
-
-	if (self.entry.lastChecked + 5) > time() then 
-		print("runCheck too fast", self.entry.id)
-		return 
-	end
-
-	print("runCheck ", self.entry.id )
-
-	if self.entry.isCommodity then 
-		self:RegisterEvent("COMMODITY_SEARCH_RESULTS_UPDATED")
-		C_AuctionHouse.SendSearchQuery(self.entry.itemKey, {
-			{sortOrder = Enum.AuctionHouseSortOrder.Price, reverseSort = false},
-		}, true)
-	else
-		self:RegisterEvent("ITEM_SEARCH_RESULTS_UPDATED")
-
-		C_AuctionHouse.SendSearchQuery(self.entry.itemKey, {
-			{sortOrder = Enum.AuctionHouseSortOrder.Buyout, reverseSort = false},
-		}, true)
-	end
-
+	MUHAP.Queue:add({
+		type = "check",
+		itemKey = self.entry.itemKey
+	})
 end
 
 

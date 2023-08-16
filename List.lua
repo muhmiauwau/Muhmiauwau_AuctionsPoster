@@ -71,7 +71,7 @@ function MUHAP.List:update()
 	end)
 
 
-    MUHAP.Footer:checkAuctions()
+    MUHAP.Footer:UpdateDisplay()
 
     self:set(list)
 

@@ -99,6 +99,7 @@
         "CreateFramePool",
         "TutorialHelper",
         "SearchBagsForItem",
-        "OpenBag"
+        "OpenBag",
+        "assertsafe"
     ]
 }

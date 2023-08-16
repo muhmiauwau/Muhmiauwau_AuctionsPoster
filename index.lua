@@ -37,13 +37,9 @@ MUHAP_CREATE_BUTTON = "Create"
 
 
 MUHAP.state =  {
-	showDisabled = false
-}
-
-
-MUHAP.state =  {
 	showDisabled = false,
-	List = {}
+	List = {},
+	Queue = {}
 }
 
 
@@ -132,6 +128,9 @@ function MUHAP:OnInitialize()
  
  function MUHAP:OnEnable()
 	MUHAP:RegisterEvent("ADDON_LOADED", "AddonLoadedEvent")
+
+	MUHAP:RegisterEvent("ITEM_SEARCH_RESULTS_UPDATED", "ItemCheckEvent")
+	MUHAP:RegisterEvent("COMMODITY_SEARCH_RESULTS_UPDATED", "ItemCheckEvent")
  end
  
  
@@ -214,30 +213,134 @@ end
 
 
 
-function MUHAP:triggerAllChecks()
-
-	_.map(MUHAP.Entry:getAll(), function(frame)
-		frame:runCheck() 
-	end)
+function MUHAP:ItemCheckEvent(event, itemKey)
+	if MUHAP.Footer.checksNum == 0 then return end
 
 
-	C_Timer.After(3, function() 
-		MUHAP.List:reload()
-	end)
 
- end
+	local itemKey = _.isTable(itemKey) and itemKey or C_AuctionHouse.MakeItemKey(itemKey)
 
- function MUHAP:triggerAllPostAuctions()
-	print("triggerAllPostAuctions")
-	local items = _.filter(MUHAP.List:get(), function(v)
-		return v.status.auction == true
-	end)
-	local item = _.first(items)
-	if item then
-		local frame = MUHAP.Entry:get(item.itemKey)
-		frame:PostItem()
+	local queueEntry = {
+		type =  "check",
+		itemKey = itemKey
+	}
+	local isInQuery = MUHAP.Queue:get(queueEntry)
 
-		MUHAP.Footer.PostButton:SetEnabled(false);
+	if isInQuery then 
+		local item = MUHAP.Item:get(itemKey)
+
+		MUHAP.Queue:delete(queueEntry)
+
+
+		local priceKey = "buyoutAmount"
+		if item.isCommodity then 
+			priceKey = "unitPrice"
+		end
+
+		local needUpdate = function(result)
+			local match = true
+			
+			if #result.owners > 0 then 
+				local _, realm =  UnitName("player")
+				local formattedName = MUHAP:formatPlayerName(result.owners[1], realm )
+				if result.owners[1] == "player" or AuctionsPosterDB.activeChars[formattedName] or AuctionsPosterDB.activeChars[result.owners[1] ] then 
+					match = false
+				end
+			else
+				match = false
+			end
+
+			if item.minPrice > result[priceKey] then 
+				match = false
+			end
+
+			return match
+		end
+
+		local result = nil
+		
+		if item.isCommodity then 
+			result = C_AuctionHouse.GetCommoditySearchResultInfo(itemKey.itemID, 1)
+		else 
+			result = C_AuctionHouse.GetItemSearchResultInfo(itemKey, 1)
+		end
+
+
+		if result then 
+			print("ok")
+			item.needAction = needUpdate(result)
+			item.buyoutAmount = result[priceKey]
+		else
+			print("not")
+			item.needAction = false
+			item.buyoutAmount = 0
+		end
+
+		item.lastChecked = time()
+
+		
+
+		local entry = MUHAP.Entry:get(itemKey)
+		entry:Init(item)
+
 	end
- end
 
+	
+
+
+		
+
+			--[[
+			
+
+			local priceKey = "buyoutAmount"
+			if self.entry.isCommodity then 
+				priceKey = "unitPrice"
+			end
+
+
+            local needUpdate = function(result)
+				local match = true
+				
+				if #result.owners > 0 then 
+					local _, realm =  UnitName("player")
+					local formattedName = MUHAP:formatPlayerName(result.owners[1], realm )
+					if result.owners[1] == "player" or AuctionsPosterDB.activeChars[formattedName] or AuctionsPosterDB.activeChars[result.owners[1] ] then 
+						match = false
+					end
+				else
+					match = false
+				end
+
+				if self.entry.minPrice > result[priceKey] then 
+					match = false
+				end
+
+                return match
+            end
+
+			local result = nil
+			
+			if self.entry.isCommodity then 
+				result = C_AuctionHouse.GetCommoditySearchResultInfo(self.entry.itemKey.itemID, 1)
+			else 
+				result = C_AuctionHouse.GetItemSearchResultInfo(self.entry.itemKey, 1)
+			end
+
+
+			if result then 
+				self:SetNeedAction(needUpdate(result))
+				self:SetBuyoutAmount(result[priceKey])
+			else
+				self:SetNeedAction(false)
+				self:SetBuyoutAmount(0)
+			end
+
+
+			self.entry.lastChecked = time()
+
+			print("check end", self.entry.itemKey.itemID)
+]]
+        
+
+end

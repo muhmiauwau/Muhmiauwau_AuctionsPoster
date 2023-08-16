@@ -12,18 +12,15 @@ local _ = Lodash:init()
 MUHAP.Item = {}
 
 
-function MUHAP.Item:exist(id, level)
-	return self:get(id, level) and true or false
+function MUHAP.Item:exist(itemKey)
+	return self:get(itemKey) and true or false
 end
 
 
-function MUHAP.Item:get(id, level)
+function MUHAP.Item:get(itemKey)
+    assert(_.table(itemKey), "itemKey is not table")
     local find = _.find(MUHAP.items, function(v)
-        if level then 
-            return v.id == id and v.itemKey.itemLevel == level
-        else 
-            return v.id == id 
-        end 
+        return v.itemKey.itemID == itemKey.itemID  and v.itemKey.itemLevel == itemKey.itemLevel
     end)
 
     return find
@@ -77,7 +74,7 @@ function MUHAP.Item:addMissingInfo(entry)
 end
 
 function MUHAP.Item:add(entry)
-    if self:exist(entry.itemKey.itemID, entry.itemKey.itemLevel) then return end
+    if self:exist(entry.itemKey) then return end
     entry = self:addMissingInfo(entry)
     MUHAP.items[#MUHAP.items + 1] = entry
     MUHAP.Tabs:SetTab(2, true)
@@ -85,7 +82,7 @@ end
 
 
 function MUHAP.Item:delete(itemKey)
-	if not self:exist(itemKey.itemID, itemKey.itemLevel) then return end
+	if not self:exist(itemKey) then return end
 
     _.remove(MUHAP.items, function(value)
         return value.itemKey.itemID == itemKey.itemID and  value.itemKey.itemLevel == itemKey.itemLevel
@@ -111,6 +108,27 @@ function MUHAP.Item:getItemLocation(itemID)
     return newItemLocation;
 end
 
+
+
+
+function MUHAP.Item:runCheck(itemKey)
+    if not itemKey then return end 
+
+    local item = self:get(itemKey)
+    if not item.enabled then return end
+
+	if (item.lastChecked + 5) > time() then 
+		print("runCheck too fast", item.id)
+		return
+	end
+
+    local sortOrder = (item.isCommodity) and  Enum.AuctionHouseSortOrder.Price or Enum.AuctionHouseSortOrder.Buyout
+
+    C_AuctionHouse.SendSearchQuery(item.itemKey, {
+        {sortOrder = sortOrder, reverseSort = false},
+    }, true)
+
+end
 
 
 

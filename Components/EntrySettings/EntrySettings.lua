@@ -131,8 +131,6 @@ end
 
 function MUHAPEntrySettingsMixin:UpdateEnabled(state)
 	self.entry.enabled = state
-	--self:ToggleDeleteButton(state)
-	self:GetParent():UpdateEnabled()
 end
 
 

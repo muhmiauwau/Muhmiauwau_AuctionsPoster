@@ -9,13 +9,11 @@ end
 
 function CreateNew:CreateNew()
 	if self.itemLocation then 
-		local id = C_Item.GetItemID(self.itemLocation)
-		local itemLevel = C_Item.GetCurrentItemLevel(self.itemLocation)
-
-		if not MUHAP.Item:exist(id, itemLevel) then 
+		local itemKey = C_AuctionHouse.GetItemKeyFromItem(self.itemLocation)
+		if not MUHAP.Item:exist(itemKey) then 
 			local entry = {
-				id = id,
-				itemKey = C_AuctionHouse.MakeItemKey(id, itemLevel),
+				id = itemKey.itemID,
+				itemKey = itemKey,
 				minPrice = 0,
 				lastChecked = time(),
 				qty = 1,
@@ -54,9 +52,8 @@ function ItemDisplay:OnLoad()
 
 	self.NineSlice:Hide();
 	self:SetOnItemChangedCallback(function(itemLocation)
-		local id = self:GetItemID()
-		local itemLevel = C_Item.GetCurrentItemLevel(itemLocation)
-		if C_AuctionHouse.IsSellItemValid(itemLocation) == false or MUHAP.Item:exist(id, itemLevel) then 
+		local itemKey = C_AuctionHouse.GetItemKeyFromItem(itemLocation)
+		if C_AuctionHouse.IsSellItemValid(itemLocation) == false or MUHAP.Item:exist(itemKey) then 
 			self:Reset()
 			C_Item.UnlockItem(itemLocation);
 		else
