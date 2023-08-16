@@ -229,13 +229,12 @@ function MUHAP:triggerAllChecks()
 
  function MUHAP:triggerAllPostAuctions()
 	print("triggerAllPostAuctions")
-	print(#MUHAP.List:get(), #MUHAP.state.List)
 	local items = _.filter(MUHAP.List:get(), function(v)
 		return v.status.auction == true
 	end)
 	local item = _.first(items)
 	if item then
-		local frame = MUHAP.Entry:get(item.id)
+		local frame = MUHAP.Entry:get(item.itemKey)
 		frame:PostItem()
 
 		MUHAP.Footer.PostButton:SetEnabled(false);

@@ -108,19 +108,22 @@ end
 function Entry:OnEvent(event, itemKey)
 
 	if event == "ITEM_SEARCH_RESULTS_UPDATED" or event == "COMMODITY_SEARCH_RESULTS_UPDATED" then
-	
-		local itemID = itemKey
-
-		if event == "ITEM_SEARCH_RESULTS_UPDATED" then
-			itemID = itemKey.itemID
-		end
-
+		
 		if 
+		(
+			event == "ITEM_SEARCH_RESULTS_UPDATED"
+			and
 			self.entry.itemKey.itemID == itemKey.itemID
-		and 
+			and 
 			self.entry.itemKey.itemLevel == itemKey.itemLevel
+		)
+		or
+		(
+			event == "COMMODITY_SEARCH_RESULTS_UPDATED"
+			and
+			self.entry.itemKey.itemID == itemKey
+		)
 		then 
-
 			self:UnregisterEvent(event)
 
 			
@@ -154,12 +157,11 @@ function Entry:OnEvent(event, itemKey)
 			local result = nil
 			
 			if self.entry.isCommodity then 
-				result = C_AuctionHouse.GetCommoditySearchResultInfo(itemID, 1)
+				result = C_AuctionHouse.GetCommoditySearchResultInfo(self.entry.itemKey.itemID, 1)
 			else 
 				result = C_AuctionHouse.GetItemSearchResultInfo(self.entry.itemKey, 1)
 			end
 
-			
 
 			if result then 
 				self:SetNeedAction(needUpdate(result))
@@ -172,7 +174,7 @@ function Entry:OnEvent(event, itemKey)
 
 			self.entry.lastChecked = time()
 
-
+			print("check end", self.entry.itemKey.itemID)
 			--MUHAP.List:update()
 
         end
@@ -208,16 +210,14 @@ function Entry:runCheck()
 		return 
 	end
 
-	print("runCheck ", self.entry.id, self.entry.isCommodity )
+	print("runCheck ", self.entry.id )
 
 	if self.entry.isCommodity then 
-		--print("COMMODITY")
 		self:RegisterEvent("COMMODITY_SEARCH_RESULTS_UPDATED")
 		C_AuctionHouse.SendSearchQuery(self.entry.itemKey, {
 			{sortOrder = Enum.AuctionHouseSortOrder.Price, reverseSort = false},
 		}, true)
 	else
-		--print("item")
 		self:RegisterEvent("ITEM_SEARCH_RESULTS_UPDATED")
 
 		C_AuctionHouse.SendSearchQuery(self.entry.itemKey, {

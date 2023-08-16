@@ -49,6 +49,11 @@ end
 
 
 function ScrollFrane:ResetList()
+	local childs =  { self.list:GetChildren() }
+	_.forEach(childs, function(child, key)
+		child:Hide()
+	end)
+
 	MUHAP.Entry:deleteAll()
 end
 

@@ -26,7 +26,7 @@ end
 
 
 function MUHAP.Entry:delete(itemKey)
-    if not id then return end
+    if not itemKey then return end
 
     local isActive = self.pool:IsActive(frame)
     if not isActive then return end
