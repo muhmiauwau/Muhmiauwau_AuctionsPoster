@@ -6,10 +6,12 @@ function Entry:Init(entry)
 	if not entry or  not entry.id then return end
     self.entry = entry
 
-	self.itemKey = C_AuctionHouse.MakeItemKey(self.entry.id)
-	self.itemKeyInfo = C_AuctionHouse.GetItemKeyInfo(self.itemKey);
-	SetItemButtonTexture(self.ItemButton, self.itemKeyInfo.iconFileID);
-	self.Name:SetText(AuctionHouseUtil.GetItemDisplayTextFromItemKey(self.itemKey, self.itemKeyInfo));
+
+	if self.entry.itemKey then 
+		self.itemKeyInfo = C_AuctionHouse.GetItemKeyInfo(self.entry.itemKey);
+		SetItemButtonTexture(self.ItemButton, self.itemKeyInfo.iconFileID);
+		self.Name:SetText(AuctionHouseUtil.GetItemDisplayTextFromItemKey(self.entry.itemKey, self.itemKeyInfo));
+	end
 
 	self:SetBuyoutAmount(self.entry.buyoutAmount)
 	self:SetNeedAction(self.entry.needAction)
@@ -46,7 +48,9 @@ function Entry:SetNeedAction(state)
 	self.entry.needAction =  state or false
 	if self.entry.needAction then 
 		self.actionBackground:Show()
-		self.PostButton:SetEnabled(self.entry.needAction and self.entry.enabled and (self.entry.buyoutAmount > self.entry.minPrice))
+		if self.entry.buyoutAmount and self.entry.minPrice then 
+			self.PostButton:SetEnabled(self.entry.needAction and self.entry.enabled and (self.entry.buyoutAmount > self.entry.minPrice))
+		end
 	else
 		self.actionBackground:Hide()
 		self.PostButton:SetEnabled(false);
@@ -104,13 +108,19 @@ end
 function Entry:OnEvent(event, itemKey)
 
 	if event == "ITEM_SEARCH_RESULTS_UPDATED" or event == "COMMODITY_SEARCH_RESULTS_UPDATED" then
+	
 		local itemID = itemKey
 
 		if event == "ITEM_SEARCH_RESULTS_UPDATED" then
 			itemID = itemKey.itemID
 		end
 
-		if self.entry.id == itemID then 
+		if 
+			self.entry.itemKey.itemID == itemKey.itemID
+		and 
+			self.entry.itemKey.itemLevel == itemKey.itemLevel
+		then 
+
 			self:UnregisterEvent(event)
 
 			
@@ -146,8 +156,9 @@ function Entry:OnEvent(event, itemKey)
 			if self.entry.isCommodity then 
 				result = C_AuctionHouse.GetCommoditySearchResultInfo(itemID, 1)
 			else 
-				result = C_AuctionHouse.GetItemSearchResultInfo(itemKey, 1)
+				result = C_AuctionHouse.GetItemSearchResultInfo(self.entry.itemKey, 1)
 			end
+
 			
 
 			if result then 
@@ -158,10 +169,11 @@ function Entry:OnEvent(event, itemKey)
 				self:SetBuyoutAmount(0)
 			end
 
+
 			self.entry.lastChecked = time()
 
 
-			MUHAP.List:update()
+			--MUHAP.List:update()
 
         end
 	elseif event == "AUCTION_HOUSE_AUCTION_CREATED" then 
@@ -196,19 +208,19 @@ function Entry:runCheck()
 		return 
 	end
 
-	print("runCheck ", self.entry.id)
+	print("runCheck ", self.entry.id, self.entry.isCommodity )
 
 	if self.entry.isCommodity then 
 		--print("COMMODITY")
 		self:RegisterEvent("COMMODITY_SEARCH_RESULTS_UPDATED")
-		C_AuctionHouse.SendSearchQuery(self.itemKey, {
+		C_AuctionHouse.SendSearchQuery(self.entry.itemKey, {
 			{sortOrder = Enum.AuctionHouseSortOrder.Price, reverseSort = false},
 		}, true)
 	else
 		--print("item")
 		self:RegisterEvent("ITEM_SEARCH_RESULTS_UPDATED")
 
-		C_AuctionHouse.SendSearchQuery(self.itemKey, {
+		C_AuctionHouse.SendSearchQuery(self.entry.itemKey, {
 			{sortOrder = Enum.AuctionHouseSortOrder.Buyout, reverseSort = false},
 		}, true)
 	end

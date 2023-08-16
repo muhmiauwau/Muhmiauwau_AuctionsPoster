@@ -95,9 +95,9 @@ end
 
 function MUHAPEntrySettingsMixin:delete()
 
-	local id = self.entry.id
-	if id then
-		MUHAP.Item:delete(id)
+	local itemKey = self.entry.itemKey
+	if itemKey then
+		MUHAP.Item:delete(itemKey)
 		self:Hide()
 	end
 end

@@ -41,9 +41,9 @@ end
 function ScrollFrane:UpdateList()
 	self:ResetList()
 	local childs =  { self.list:GetChildren() }
-	_.forEach(self.items, function(item, key) 
+	_.forEach(self.items, function(item, key)
 		local parent = childs[key]
-		parent:Fill(item.id)
+		parent:Fill(item.itemKey)
 	end)
 end
 

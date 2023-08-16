@@ -11,10 +11,11 @@ MUHAP.Entry.pool = CreateFramePool("Frame", nil, "MUHAPEntryTemplate")
 
 MUHAP.Entry.activeFrames = {}
 
-function MUHAP.Entry:get(id)
-    local find = _.find(self.activeFrames, function(v)
-        return v.entry.id == id
+function MUHAP.Entry:get(itemKey)
+    local find = _.find(self.activeFrames, function(value)
+        return value.entry.itemKey.itemID == itemKey.itemID and  value.entry.itemKey.itemLevel == itemKey.itemLevel
     end)
+
     return find
 end
 
@@ -24,14 +25,14 @@ function MUHAP.Entry:getAll()
 end
 
 
-function MUHAP.Entry:delete(id)
+function MUHAP.Entry:delete(itemKey)
     if not id then return end
 
     local isActive = self.pool:IsActive(frame)
     if not isActive then return end
 
-    local frame = _.remove(self.activeFrames, function(v)
-        return v.entry.id == id
+    local frame = _.remove(self.activeFrames, function(value)
+        return value.entry.itemKey.itemID == itemKey.itemID and  value.entry.itemKey.itemLevel == itemKey.itemLevel
     end)
     if not frame then return end
     self.pool:Release(frame)
@@ -45,14 +46,14 @@ function MUHAP.Entry:deleteAll()
 end
 
 
-function MUHAP.Entry:add(id)
-	if not id then return end
+function MUHAP.Entry:add(itemKey)
+	if not itemKey then return end
 
-    local exist = self:get(id)
+    local exist = self:get(itemKey)
     if exist then return exist end
 
-    local entry = MUHAP.Item:get(id)
-    if not entry then return end
+   local entry = MUHAP.Item:get(itemKey.itemID, itemKey.itemLevel)
+   if not entry then return end
 
     local Item = self.pool:Acquire()
 	Item:Init(entry)

@@ -9,13 +9,13 @@ function ListItem:Empty()
     local child = self:GetChildren()
 
     if child then 
-        MUHAP.Entry:delete(child.entry.id)
+        MUHAP.Entry:delete(child.entry.itemKey)
     end
 end
 
-function ListItem:Fill(id)
+function ListItem:Fill(itemKey)
     self:Show()
-    local entryFrame = MUHAP.Entry:add(id)
+    local entryFrame = MUHAP.Entry:add(itemKey)
 
     if entryFrame then 
         entryFrame:Show()

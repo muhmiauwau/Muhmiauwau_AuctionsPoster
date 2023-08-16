@@ -8,23 +8,23 @@ end
 
 
 function CreateNew:CreateNew()
-	if self.id then 
-		if not MUHAP.Item:exist(self.id) then 
+	if self.itemLocation then 
+		local id = C_Item.GetItemID(self.itemLocation)
+		local itemLevel = C_Item.GetCurrentItemLevel(self.itemLocation)
 
+		if not MUHAP.Item:exist(id, itemLevel) then 
 			local entry = {
-				id = self.id,
+				id = id,
+				itemKey = C_AuctionHouse.MakeItemKey(id, itemLevel),
 				minPrice = 0,
 				lastChecked = time(),
 				qty = 1,
 				enabled = false,
 				needAction = false,
-				duration = 1
+				duration = 1,
+				isCommodity =  (C_AuctionHouse.GetItemCommodityStatus(self.itemLocation) == 2 ) and true or false
 			}
 
-			local ILocation = MUHAP.Item:getItemLocation(self.id)
-			if ILocation then 
-				entry.isCommodity = (C_AuctionHouse.GetItemCommodityStatus(ILocation) == 2 ) and true or false
-			end
 
 			MUHAP.Item:add(entry)
 			self:Reset()
@@ -32,19 +32,15 @@ function CreateNew:CreateNew()
 	end
 end
 
-function CreateNew:SetId(id)
-	self.id = id
-	local state = (self.id ~= nil) 
-	self.CreateButton:SetEnabled(state);
-end
-
 
 function CreateNew:SetItemLocation(itemLocation)
 	self.itemLocation = itemLocation
+	local state = (itemLocation ~= nil) 
+	self.CreateButton:SetEnabled(state);
 end
 
 function CreateNew:Reset()
-	self:SetId(nil)
+	--self:SetId(nil)
 	self.ItemDisplay:Reset()
 	C_Item.UnlockItem(self.itemLocation);
 	self.itemLocation = nil
@@ -57,15 +53,14 @@ function ItemDisplay:OnLoad()
 	AuctionHouseInteractableItemDisplayMixin.OnLoad(self);
 
 	self.NineSlice:Hide();
-
 	self:SetOnItemChangedCallback(function(itemLocation)
-		self:GetParent():SetItemLocation(itemLocation)
 		local id = self:GetItemID()
-		if C_AuctionHouse.IsSellItemValid(itemLocation) == false or MUHAP.Item:exist(id) then 
+		local itemLevel = C_Item.GetCurrentItemLevel(itemLocation)
+		if C_AuctionHouse.IsSellItemValid(itemLocation) == false or MUHAP.Item:exist(id, itemLevel) then 
 			self:Reset()
 			C_Item.UnlockItem(itemLocation);
 		else
-			self:GetParent():SetId(id)
+			self:GetParent():SetItemLocation(itemLocation)
 		end
 	end)
 end
